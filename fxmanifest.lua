@@ -2,11 +2,11 @@ fx_version 'cerulean'
 use_experimental_fxv2_oal 'yes'
 lua54 'yes'
 game 'gta5'
-name 'ox_inventory'
-author 'Overextended'
+name 'ox_inventory_pcore'
+author 'Overextended & P Studio'
 version '2.44.1'
 repository 'https://github.com/overextended/ox_inventory'
-description 'Slot-based inventory with item metadata support'
+description 'Slot-based inventory with item metadata support. This inventory only supports Pcore. Please use original ox_inventory repository for other frameworks or supports.'
 
 dependencies {
     '/server:6116',

@@ -37,6 +37,11 @@ Citizen.CreateThreadNow(function()
         playerColumn = 'citizenid'
         vehicleTable = 'player_vehicles'
         vehicleColumn = 'id'
+    elseif shared.framework == 'pcore' then
+        playerTable = 'characters_inventory'
+        playerColumn = 'charId'
+        vehicleTable = 'vehicles'
+        vehicleColumn = 'id'
     else
         return
     end
