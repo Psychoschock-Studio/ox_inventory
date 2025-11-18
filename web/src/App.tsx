@@ -26,10 +26,10 @@ debugData([
         items: [
           {
             slot: 1,
-            name: 'iron',
+            name: 'weed',
             weight: 3000,
             metadata: {
-              description: `name: Svetozar Miletic  \n Gender: Male`,
+              description: `Type: Miletic  \n Category: Green`,
               ammo: 3,
               mustard: '60%',
               ketchup: '30%',
@@ -37,8 +37,8 @@ debugData([
             },
             count: 5,
           },
-          { slot: 2, name: 'powersaw', weight: 0, count: 1, metadata: { durability: 75 } },
-          { slot: 3, name: 'copper', weight: 100, count: 12, metadata: { type: 'Special' } },
+          { slot: 2, name: 'lockpick', weight: 0, count: 1, metadata: { durability: 75 } },
+          { slot: 3, name: 'advancedkit', weight: 100, count: 12, metadata: { type: 'Mechanic' } },
           {
             slot: 4,
             name: 'water',

@@ -1,17 +1,21 @@
-$mainColor: #22232c;
+$mainColor: #1f1f1f;
 $textColor: #c1c2c5;
-$mainFont: Roboto;
+$mainFont: 'Inter', 'Segoe UI', Roboto, sans-serif;
 
-$secondaryColor: rgba(12, 12, 12, 0.4);
+$secondaryColor: #333335;
 $secondaryColorHighlight: #33343F;
 $secondaryColorLight: rgba(0, 0, 0, 0.5);
 $secondaryColorDark: rgba(12, 12, 12, 0.8);
 
+$btnUseColor: #212f3c;
+$btnGiveColor: #253728;
+$quantityBoxColor: #2f2f2f;
+
 $gridCols: 5;
-$gridRows: 5;
-$gridSize: 10.2vh;
-$gridGap: 2px;
-$containerSize: calc(#{$gridRows} * #{$gridSize + 0.22vh} + #{$gridRows} * #{$gridGap});
+$gridRows: 4;
+$gridSize: 9vh;
+$gridGap: 4px;
+$containerSize: calc(#{$gridRows} * #{$gridSize} + (#{$gridRows} - 1) * #{$gridGap});
 
 body {
   margin: 0;
@@ -60,19 +64,18 @@ input[type='number']::-webkit-outer-spin-button {
   min-width: 200px;
   background-color: $mainColor;
   color: $textColor;
-  padding: 4px;
-  border-color: rgba(0, 0, 0, 0.2);
-  border-style: inset;
-  border-width: 1px;
-  border-radius: 4px;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
   outline: none;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .context-menu-item  {
-  padding: 8px;
-  border-radius: 4px;
+  padding: 10px 12px;
+  border-radius: 8px;
   background-color: transparent;
   outline: none;
   border: none;
@@ -80,6 +83,7 @@ input[type='number']::-webkit-outer-spin-button {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: 500;
   &:active {
     transform: none;
   }
@@ -102,8 +106,8 @@ button:active {
 }
 
 .item-drag-preview {
-  width: 7.7vh;
-  height: 7.7vh;
+  width: 9vh;
+  height: 9vh;
   z-index: 1;
   position: fixed;
   pointer-events: none;
@@ -111,61 +115,139 @@ button:active {
   left: 0;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 7vh;
+  background-size: 6.5vh;
   image-rendering: -webkit-optimize-contrast;
+  background-color: $secondaryColor;
+  border-radius: 10px;
+  opacity: 0.8;
 }
 
 .inventory-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   height: 100%;
+  gap: 15px;
+  padding-right: 100px;
+}
 
-  gap: 20px;
+.inventory-container {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  align-items: center;
+}
+
+.inventory-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: $mainColor;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.inventory-close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  color: #e74c3c;
+  transition: all 0.2s;
+  
+  &:hover {
+    color: #c0392b;
+    transform: scale(1.1);
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .inventory-control {
   display: flex;
+  width: 100%;
 
   .inventory-control-wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    justify-content: center;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: space-between;
     align-items: center;
+    width: 100%;
   }
 
   .inventory-control-input {
     transition: 200ms;
-    padding: 16px 8px;
-    border-radius: 2.5%;
+    padding: 8px 10px;
+    border-radius: 6px;
     font-family: $mainFont;
-    font-size: 16px;
+    font-size: 13px;
     text-align: center;
     outline: none;
     border: none;
     color: #fff;
     background-color: $secondaryColor;
+    font-weight: 500;
+    width: 0;
+    flex: 1;
+    min-width: 0;
     &:focus-within {
       background-color: $secondaryColorDark;
     }
   }
 
   .inventory-control-button {
-    font-size: 14px;
+    font-size: 12px;
     color: #fff;
     background-color: $secondaryColor;
     transition: 200ms;
-    padding: 12px 8px;
-    border-radius: 2.5%;
+    padding: 8px 10px;
+    border-radius: 6px;
     border: none;
     text-transform: uppercase;
     font-family: $mainFont;
-    width: 100%;
-    font-weight: 500;
+    width: 0;
+    flex: 1;
+    min-width: 0;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
     &:hover {
       background-color: $secondaryColorDark;
+      transform: translateY(-1px);
+    }
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+  
+  .inventory-control-button-use {
+    background-color: $btnUseColor !important;
+    color: #5dade2 !important;
+    &:hover {
+      background-color: #2a4052 !important;
+      color: #85c1e9 !important;
+    }
+  }
+  
+  .inventory-control-button-give {
+    background-color: $btnGiveColor !important;
+    color: #58d68d !important;
+    &:hover {
+      background-color: #2d4831 !important;
+      color: #7dcea0 !important;
     }
   }
 }
@@ -180,9 +262,10 @@ button:active {
   width: 450px;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  border-radius: 4px;
+  padding: 20px;
+  border-radius: 12px;
   gap: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .useful-controls-dialog-overlay {
@@ -204,7 +287,7 @@ button:active {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 4px;
+  border-radius: 8px;
   fill: $textColor;
   &:hover {
     background-color: $secondaryColorHighlight;
@@ -237,11 +320,13 @@ button:active {
   justify-content: center;
   align-items: center;
   fill: white;
-  border-radius: 5% !important;
+  border-radius: 12px !important;
   background-color: $secondaryColor !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   &:hover {
     background-color: $secondaryColorDark !important;
     cursor: pointer;
+    transform: scale(1.05);
   }
 }
 
@@ -260,24 +345,64 @@ button:active {
 .inventory-grid-wrapper {
   display: flex;
   flex-direction: column;
-  gap: calc($gridGap * 2);
+  gap: 6px;
 }
 .inventory-grid-header-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
   p {
-    font-size: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    opacity: 0.75;
+    margin: 0;
   }
+}
+
+.inventory-weight-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.inventory-weight-text {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  opacity: 0.75;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .inventory-grid-container {
   display: grid;
   height: $containerSize;
   grid-template-columns: repeat($gridCols, $gridSize);
-  grid-auto-rows: $gridSize + 0.22vh;
+  grid-auto-rows: $gridSize;
   gap: $gridGap;
   overflow-y: scroll;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $secondaryColor;
+    border-radius: 3px;
+    
+    &:hover {
+      background: $secondaryColorHighlight;
+    }
+  }
 }
 
 // inventory slots
@@ -285,47 +410,32 @@ button:active {
   background-color: $secondaryColor;
   background-repeat: no-repeat;
   background-position: center;
-  border-radius: 2.5%;
+  border-radius: 10px;
   image-rendering: -webkit-optimize-contrast;
   position: relative;
-  background-size: 7vh;
+  background-size: 6.5vh;
   color: $textColor;
-  border-color: rgba(0, 0, 0, 0.2);
-  border-style: inset;
-  border-width: 1px;
+  border: none;
 }
 
 .inventory-slot-label-box {
-  background-color: $mainColor;
-  color: $textColor;
-  text-align: center;
-  border-bottom-left-radius: 0.25vh;
-  border-bottom-right-radius: 0.25vh;
-  border-top-color: rgba(0, 0, 0, 0.2);
-  border-top-style: inset;
-  border-top-width: 1px;
+  display: none;
 }
 
 .inventory-slot-label-text {
-  text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 2px 3px;
-  font-weight: 400;
-  font-family: $mainFont;
-  font-size: 12px;
+  display: none;
 }
 
 .inventory-slot-number {
-  background-color: white;
-  color: black;
-  height: 12px;
-  border-top-left-radius: 0.25vh;
-  border-bottom-right-radius: 0.25vh;
-  padding: 3px;
-  font-size: 12px;
+  background-color: rgba(47, 47, 47, 0.7);
+  color: white;
+  height: auto;
+  border-top-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  padding: 2px 5px;
+  font-size: 10px;
   font-family: $mainFont;
+  font-weight: 600;
 }
 
 .item-slot-wrapper {
@@ -351,12 +461,19 @@ button:active {
 
 .item-slot-info-wrapper {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-self: flex-end;
   padding: 3px;
-  gap: 3px;
+  gap: 2px;
+  align-items: flex-end;
   p {
-    font-size: 12px;
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    margin: 0;
   }
 }
 
@@ -389,15 +506,14 @@ button:active {
   display: flex;
   background-color: $mainColor;
   width: 200px;
-  padding: 8px;
+  padding: 12px;
   flex-direction: column;
   min-width: 200px;
   color: $textColor;
   font-family: $mainFont;
-  border-radius: 4px;
-  border-color: rgba(0, 0, 0, 0.2);
-  border-style: inset;
-  border-width: 1px;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   p {
     font-size: 12px;
     font-weight: 400;
@@ -447,7 +563,7 @@ button:active {
 .hotbar-container {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   justify-content: center;
   width: 100%;
   position: absolute;
@@ -458,6 +574,7 @@ button:active {
   @extend .inventory-slot;
   width: $gridSize;
   height: $gridSize;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .hotbar-slot-header-wrapper {
@@ -487,13 +604,14 @@ button:active {
   background-color: $secondaryColor;
   text-transform: uppercase;
   text-align: center;
-  border-top-left-radius: 0.25vh;
-  border-top-right-radius: 0.25vh;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   font-family: $mainFont;
   p {
     font-size: 11px;
-    padding: 2px;
+    padding: 3px;
     font-weight: 600;
+    letter-spacing: 0.3px;
   }
 }
 
@@ -501,20 +619,28 @@ button:active {
   @extend .inventory-slot;
   height: $gridSize;
   width: $gridSize;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .durability-bar {
   background: rgba(0, 0, 0, 0.5);
-  height: 3px;
+  height: 2.5px;
   overflow: hidden;
+  border-radius: 0 0 8px 8px;
 }
 
 .weight-bar {
   background: rgba(0, 0, 0, 0.4);
-  border: 1px inset rgba(0, 0, 0, 0.1);
-  height: 0.8vh;
-  border-radius: 5%;
+  border: none;
+  height: 5px;
+  border-radius: 4px;
   overflow: hidden;
+  flex: 1;
+  
+  .weight-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+  }
 }
 
 .transition-fade-enter {
@@ -551,4 +677,47 @@ button:active {
 .transition-slide-up-exit-active {
   transform: translateY(200px);
   transition: all 200ms;
+}
+
+// Action buttons
+.action-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  background-color: $mainColor;
+  padding: 8px 4px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.action-button {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms ease;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 0;
+  font-size: 16px;
+  border-radius: 2px;
+  
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  &:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.9);
+  }
 }
