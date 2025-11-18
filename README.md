@@ -1,6 +1,6 @@
 # ox_inventory
 
-A complete inventory system for FiveM, implementing items, weapons, shops, and more without any strict framework dependency.
+A complete inventory system for FiveM, implementing items, weapons, shops for pcore. Please note this is a fork and does not represent the work for P Studio. This only support the framework.
 
 ![](https://img.shields.io/github/downloads/communityox/ox_inventory/total?logo=github)
 ![](https://img.shields.io/github/downloads/communityox/ox_inventory/latest/total?logo=github)
@@ -17,12 +17,9 @@ https://github.com/communityox/ox_inventory/releases/latest/download/ox_inventor
 
 ## Supported frameworks
 
-We do not guarantee compatibility or support for third-party resources.
+We do not guarantee compatibility for any framework supported by the main inventory repo.
 
-- [ox_core](https://github.com/communityox/ox_core)
-- [esx](https://github.com/esx-framework/esx_core)
-- [qbox](https://github.com/Qbox-project/qbx_core)
-- [nd_core](https://github.com/ND-Framework/ND_Core)
+- [pcore](https://pcore.store)
 
 ## ✨ Features
 

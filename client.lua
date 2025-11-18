@@ -1770,6 +1770,12 @@ RegisterNUICallback('exit', function(_, cb)
 	cb(1)
 end)
 
+RegisterNUICallback('actionButton', function(data, cb)
+	-- Handle action button clicks
+	-- data.id contains the button ID (1-6)
+	cb(1)
+end)
+
 lib.callback.register('ox_inventory:startCrafting', function(id, recipe)
 	recipe = CraftingBenches[id].items[recipe]
 

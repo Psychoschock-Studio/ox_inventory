@@ -22,6 +22,11 @@ Citizen.CreateThreadNow(function()
         playerColumn = 'charid'
         vehicleTable = 'vehicles'
         vehicleColumn = 'id'
+    elseif shared.framework == 'pcore' then
+        playerTable = 'characters'
+        playerColumn = 'charId'
+        vehicleTable = 'vehicles'
+        vehicleColumn = 'id'
     elseif shared.framework == 'esx' then
         playerTable = 'users'
         playerColumn = 'identifier'

@@ -570,7 +570,7 @@ lib.addCommand({'additem', 'giveitem'}, {
 		{ name = 'count', type = 'number', help = 'The amount of the item to give', optional = true },
 		{ name = 'type', help = 'Sets the "type" metadata to the value', optional = true },
 	},
-	restricted = 'group.admin',
+	restricted = 'group.modo',
 }, function(source, args)
 	local item = Items(args.item)
 
@@ -600,7 +600,7 @@ lib.addCommand('removeitem', {
 		{ name = 'count', type = 'number', help = 'The amount of the item to take', optional = true },
 		{ name = 'type', help = 'Only remove items with a matching metadata "type"', optional = true },
 	},
-	restricted = 'group.admin',
+	restricted = 'group.modo',
 }, function(source, args)
 	local item = Items(args.item)
 
@@ -630,7 +630,7 @@ lib.addCommand('setitem', {
 		{ name = 'count', type = 'number', help = 'The amount of items to set', optional = true },
 		{ name = 'type', help = 'Add or remove items with the metadata "type"', optional = true },
 	},
-	restricted = 'group.admin',
+	restricted = 'group.modo',
 }, function(source, args)
 	local item = Items(args.item)
 
@@ -676,7 +676,7 @@ lib.addCommand('takeinv', {
 	params = {
 		{ name = 'target', type = 'playerId', help = 'The player to confiscate items from' },
 	},
-	restricted = 'group.admin',
+	restricted = 'group.modo',
 }, function(source, args)
 	Inventory.Confiscate(args.target)
 end)
@@ -686,7 +686,7 @@ lib.addCommand({'restoreinv', 'returninv'}, {
 	params = {
 		{ name = 'target', type = 'playerId', help = 'The player to restore items to' },
 	},
-	restricted = 'group.admin',
+	restricted = 'group.modo',
 }, function(source, args)
 	Inventory.Return(args.target)
 end)
@@ -696,7 +696,7 @@ lib.addCommand('clearinv', {
 	params = {
 		{ name = 'invId', help = 'The inventory to wipe items from' },
 	},
-	restricted = 'group.admin',
+	restricted = 'group.modo',
 }, function(source, args)
 	Inventory.Clear(tonumber(args.invId) or args.invId == 'me' and source or args.invId)
 end)
@@ -706,7 +706,7 @@ lib.addCommand('saveinv', {
 	params = {
 		{ name = 'lock', help = 'Lock inventory access, until restart or saved without a lock', optional = true },
 	},
-	restricted = 'group.admin',
+	restricted = 'group.modo',
 }, function(source, args)
 	Inventory.SaveInventories(args.lock == 'true', false)
 end)
@@ -716,7 +716,7 @@ lib.addCommand('viewinv', {
 	params = {
 		{ name = 'invId', help = 'The inventory to inspect' },
 	},
-	restricted = 'group.admin',
+	restricted = 'group.modo',
 }, function(source, args)
 	Inventory.InspectInventory(source, tonumber(args.invId) or args.invId)
 end)
