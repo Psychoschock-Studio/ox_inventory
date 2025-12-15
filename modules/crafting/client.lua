@@ -95,4 +95,72 @@ end
 
 for id, data in pairs(lib.load('data.crafting') or {}) do createCraftingBench(data.name or id, data) end
 
+---@param id string Unique bench identifier
+---@param data table Bench data with items, label, etc.
+local function registerCraftingBench(id, data)
+    if not id or not data then return false end
+    
+    -- Create the bench without points/zones (pcore2 handles interactions)
+    data.points = nil
+    data.zones = nil
+    data.blip = nil -- pcore2 handles blips
+    
+    createCraftingBench(id, data)
+    return true
+end
+
+---@param id string Bench identifier to update
+---@param data table New bench data
+local function updateCraftingBench(id, data)
+    if not id or not data then return false end
+    
+    -- Remove old bench first
+    CraftingBenches[id] = nil
+    
+    -- Create with new data
+    data.points = nil
+    data.zones = nil
+    data.blip = nil
+    
+    createCraftingBench(id, data)
+    return true
+end
+
+---@param id string Bench identifier to remove
+local function removeCraftingBench(id)
+    if not id then return false end
+    CraftingBenches[id] = nil
+    return true
+end
+
+---@param id string Bench identifier
+---@return table|nil Bench data
+local function getCraftingBench(id)
+    return CraftingBenches[id]
+end
+
+---@return table All crafting benches
+local function getAllCraftingBenches()
+    return CraftingBenches
+end
+
+exports('registerCraftingBench', registerCraftingBench)
+exports('updateCraftingBench', updateCraftingBench)
+exports('removeCraftingBench', removeCraftingBench)
+exports('getCraftingBench', getCraftingBench)
+exports('getAllCraftingBenches', getAllCraftingBenches)
+
+-- Event to sync bench from server
+RegisterNetEvent('ox_inventory:registerCraftingBench', function(id, data)
+    registerCraftingBench(id, data)
+end)
+
+RegisterNetEvent('ox_inventory:updateCraftingBench', function(id, data)
+    updateCraftingBench(id, data)
+end)
+
+RegisterNetEvent('ox_inventory:removeCraftingBench', function(id)
+    removeCraftingBench(id)
+end)
+
 return CraftingBenches

@@ -191,4 +191,59 @@ end)
 exports('Items', function(item) return getItem(nil, item) end)
 exports('ItemList', function(item) return getItem(nil, item) end)
 
+RegisterNetEvent('ox_inventory:itemRegistered', function(name, data)
+    if not name or not data then return end
+    
+    name = name:lower()
+    data.name = name
+    data.count = 0
+    data.server = nil
+    
+    local clientData = data.client
+    if clientData then
+        if clientData.export then
+            local resource, exportName = string.strsplit('.', clientData.export)
+            data.export = function(...)
+                return exports[resource][exportName](nil, ...)
+            end
+        end
+    end
+    
+    Items[name] = data
+    
+    SendNUIMessage({
+        action = 'itemRegistered',
+        data = { name = name, item = data }
+    })
+end)
+
+RegisterNetEvent('ox_inventory:itemRemoved', function(name)
+    if not name then return end
+    
+    name = name:lower()
+    Items[name] = nil
+    
+    SendNUIMessage({
+        action = 'itemRemoved',
+        data = { name = name }
+    })
+end)
+
+RegisterNetEvent('ox_inventory:itemUpdated', function(name, data)
+    if not name or not data then return end
+    
+    name = name:lower()
+    
+    if Items[name] then
+        for k, v in pairs(data) do
+            Items[name][k] = v
+        end
+        
+        SendNUIMessage({
+            action = 'itemUpdated',
+            data = { name = name, item = Items[name] }
+        })
+    end
+end)
+
 return Items

@@ -42,9 +42,81 @@ setmetatable(Items --[[@as table]], {
 ---@cast Items +fun(itemName: string): OxServerItem
 ---@cast Items +fun(): table<string, OxServerItem>
 
--- Support both names
 exports('Items', function(item) return getItem(nil, item) end)
 exports('ItemList', function(item) return getItem(nil, item) end)
+
+exports('registerItem', function(name, data)
+    if not name or not data then return false end
+    
+    name = name:lower()
+    
+    data.name = name
+    data.weight = data.weight or 0
+    
+    if data.close == nil then
+        data.close = true
+    end
+    
+    if data.stack == nil then
+        data.stack = true
+    end
+    
+    if not data.consume and (data.client and (data.client.status or data.client.usetime or data.client.export) or data.server?.export) then
+        data.consume = 1
+    end
+    
+    if not data.durability then
+        if data.degrade or (data.consume and data.consume ~= 0 and data.consume < 1) then
+            data.durability = true
+        end
+    end
+    
+    local serverData = data.server
+    data.client = nil
+    
+    if serverData and serverData.export then
+        local resource, exportName = string.strsplit('.', serverData.export)
+        data.cb = function(...)
+            return exports[resource][exportName](nil, ...)
+        end
+    end
+    
+    ItemList[name] = data
+    
+    TriggerClientEvent('ox_inventory:itemRegistered', -1, name, data)
+    
+    return true
+end)
+
+exports('removeItem', function(name)
+    if not name then return false end
+    
+    name = name:lower()
+    
+    if ItemList[name] then
+        ItemList[name] = nil
+        TriggerClientEvent('ox_inventory:itemRemoved', -1, name)
+        return true
+    end
+    
+    return false
+end)
+
+exports('updateItem', function(name, data)
+    if not name or not data then return false end
+    
+    name = name:lower()
+    
+    if not ItemList[name] then return false end
+    
+    for k, v in pairs(data) do
+        ItemList[name][k] = v
+    end
+    
+    TriggerClientEvent('ox_inventory:itemUpdated', -1, name, ItemList[name])
+    
+    return true
+end)
 
 local Inventory
 

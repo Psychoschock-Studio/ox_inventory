@@ -89,6 +89,74 @@ end)
 
 local TriggerEventHooks = require 'modules.hooks.server'
 
+
+---@param id string Unique bench identifier
+---@param data table Bench data with items, label, etc.
+local function registerCraftingBench(id, data)
+    if not id or not data then return false end
+    
+    -- Create the bench without points/zones (pcore2 handles interactions)
+    data.points = nil
+    data.zones = nil
+    data.blip = nil -- pcore2 handles blips
+    
+    createCraftingBench(id, data)
+    return true
+end
+
+---@param id string Bench identifier to update
+---@param data table New bench data
+local function updateCraftingBench(id, data)
+    if not id or not data then return false end
+    
+    -- Remove old bench first
+    CraftingBenches[id] = nil
+    
+    -- Create with new data
+    data.points = nil
+    data.zones = nil
+    data.blip = nil
+    
+    createCraftingBench(id, data)
+    return true
+end
+
+---@param id string Bench identifier to remove
+local function removeCraftingBench(id)
+    if not id then return false end
+    CraftingBenches[id] = nil
+    return true
+end
+
+---@param id string Bench identifier
+---@return table|nil Bench data
+local function getCraftingBench(id)
+    return CraftingBenches[id]
+end
+
+---@return table All crafting benches
+local function getAllCraftingBenches()
+    return CraftingBenches
+end
+
+exports('registerCraftingBench', registerCraftingBench)
+exports('updateCraftingBench', updateCraftingBench)
+exports('removeCraftingBench', removeCraftingBench)
+exports('getCraftingBench', getCraftingBench)
+exports('getAllCraftingBenches', getAllCraftingBenches)
+
+local function syncCraftingBenchToClients(id, data, action)
+    if action == 'register' then
+        TriggerClientEvent('ox_inventory:registerCraftingBench', -1, id, data)
+    elseif action == 'update' then
+        TriggerClientEvent('ox_inventory:updateCraftingBench', -1, id, data)
+    elseif action == 'remove' then
+        TriggerClientEvent('ox_inventory:removeCraftingBench', -1, id)
+    end
+end
+
+exports('syncCraftingBenchToClients', syncCraftingBenchToClients)
+
 lib.callback.register('ox_inventory:craftItem', function(source, id, index, recipeId, toSlot)
 	local left, bench = Inventory(source), CraftingBenches[id]
 
