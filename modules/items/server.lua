@@ -77,7 +77,7 @@ exports('registerItem', function(name, data)
     if serverData and serverData.export then
         local resource, exportName = string.strsplit('.', serverData.export)
         data.cb = function(...)
-            return exports[resource][exportName](nil, ...)
+            return exports['pcore2'][exportName](nil, ...)
         end
     end
     
