@@ -222,4 +222,15 @@ return {
 		label = 'Scrap Metal',
 		weight = 80,
 	},
+
+	['poster'] = {
+		label = 'Affiche',
+		weight = 100,
+		stack = false,
+		close = true,
+		consume = 0,
+		server = {
+			export = 'pcore2.usePoster'
+		}
+	},
 }
