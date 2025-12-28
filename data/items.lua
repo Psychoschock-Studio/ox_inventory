@@ -136,6 +136,10 @@ return {
 	['lockpick'] = {
 		label = 'Lockpick',
 		weight = 160,
+		durability = true,
+		client = {
+			export = 'pcore2.lockpick'
+		}
 	},
 
 	['phone'] = {
