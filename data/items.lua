@@ -233,4 +233,15 @@ return {
 			export = 'pcore2.usePoster'
 		}
 	},
+
+	['vehicle_part'] = {
+		label = 'Vehicle Part',
+		weight = 500,
+		stack = false,
+		close = true,
+		consume = 0,
+		client = {
+			export = 'pcore2.useVehiclePart'
+		}
+	},
 }
