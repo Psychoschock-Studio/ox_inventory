@@ -1776,6 +1776,52 @@ RegisterNUICallback('actionButton', function(data, cb)
 	cb(1)
 end)
 
+local helpData = lib.load('data.commands') or { categories = {} }
+
+local function getFavoriteCommands()
+	local favStr = GetResourceKvpString('ox_inventory:favoriteCommands')
+	if favStr then
+		return json.decode(favStr) or {}
+	end
+	return {}
+end
+
+local function saveFavoriteCommands(favorites)
+	SetResourceKvp('ox_inventory:favoriteCommands', json.encode(favorites))
+end
+
+RegisterNUICallback('getCommands', function(_, cb)
+	cb({
+		categories = helpData.categories or {},
+		favorites = getFavoriteCommands()
+	})
+end)
+
+RegisterNUICallback('toggleFavoriteCommand', function(data, cb)
+	local favorites = getFavoriteCommands()
+	local id = data.id
+	local found = false
+	for i, v in ipairs(favorites) do
+		if v == id then
+			table.remove(favorites, i)
+			found = true
+			break
+		end
+	end
+	if not found then
+		favorites[#favorites + 1] = id
+	end
+	saveFavoriteCommands(favorites)
+	cb(1)
+end)
+
+RegisterNUICallback('setClipboard', function(data, cb)
+	if data.text then
+		lib.setClipboard(data.text)
+	end
+	cb(1)
+end)
+
 lib.callback.register('ox_inventory:startCrafting', function(id, recipe)
 	recipe = CraftingBenches[id].items[recipe]
 

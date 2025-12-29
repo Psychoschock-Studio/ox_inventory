@@ -3,12 +3,14 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import inventoryReducer from './inventory';
 import tooltipReducer from './tooltip';
 import contextMenuReducer from './contextMenu';
+import commandsReducer from './commands';
 
 export const store = configureStore({
   reducer: {
     inventory: inventoryReducer,
     tooltip: tooltipReducer,
     contextMenu: contextMenuReducer,
+    commands: commandsReducer,
   },
 });
 
