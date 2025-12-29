@@ -1778,6 +1778,7 @@ end)
 
 local helpData = lib.load('data.commands') or { categories = {} }
 local discordData = lib.load('data.discord') or { servers = {} }
+local jobsData = lib.load('data.jobs') or { categories = {} }
 
 local function getFavoriteCommands()
 	local favStr = GetResourceKvpString('ox_inventory:favoriteCommands')
@@ -1839,6 +1840,42 @@ RegisterNUICallback('openUrl', function(data, cb)
 		})
 	end
 	cb(1)
+end)
+
+RegisterNUICallback('getJobs', function(_, cb)
+	cb({
+		categories = jobsData.categories or {},
+		joinButtonLabel = jobsData.joinButtonLabel or 'Join the activity'
+	})
+end)
+
+RegisterNUICallback('triggerJobEvent', function(data, cb)
+	if not data.jobId then
+		return cb(false)
+	end
+
+	local job = nil
+	for _, category in ipairs(jobsData.categories or {}) do
+		for _, jobData in ipairs(category.jobs or {}) do
+			if jobData.id == data.jobId then
+				job = jobData
+				break
+			end
+		end
+		if job then break end
+	end
+
+	if not job then
+		return cb(false)
+	end
+
+	if job.eventServer then
+		TriggerServerEvent(job.eventServer, job.args or {})
+	elseif job.event then
+		TriggerEvent(job.event, job.args or {})
+	end
+
+	cb(true)
 end)
 
 lib.callback.register('ox_inventory:startCrafting', function(id, recipe)
