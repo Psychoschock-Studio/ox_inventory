@@ -15,10 +15,11 @@ import { closeContextMenu } from '../../store/contextMenu';
 import Fade from '../utils/transitions/Fade';
 import ActionButtons from './ActionButtons';
 import CommandsPanel from './CommandsPanel';
+import DiscordPanel from './DiscordPanel';
 import { fetchNui } from '../../utils/fetchNui';
-import { Package, Terminal } from 'lucide-react';
+import { Package, Terminal, MessageCircle } from 'lucide-react';
 
-type ActiveTab = 'inventory' | 'commands';
+type ActiveTab = 'inventory' | 'commands' | 'discord';
 
 const Inventory: React.FC = () => {
   const [inventoryVisible, setInventoryVisible] = useState(false);
@@ -53,7 +54,7 @@ const Inventory: React.FC = () => {
       <Fade in={inventoryVisible}>
         <div className="inventory-wrapper">
           <div className="inventory-container">
-            {activeTab === 'inventory' && <ActionButtons />}
+            {(activeTab === 'inventory') && <ActionButtons />}
             <div className="inventory-content">
               <button className="inventory-close-button" onClick={() => fetchNui('exit')}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor">
@@ -66,8 +67,10 @@ const Inventory: React.FC = () => {
                   <InventoryControl />
                   <RightInventory />
                 </>
-              ) : (
+              ) : activeTab === 'commands' ? (
                 <CommandsPanel />
+              ) : (
+                <DiscordPanel />
               )}
             </div>
             <div className="inventory-tabs">
@@ -84,6 +87,13 @@ const Inventory: React.FC = () => {
                 title="Commandes"
               >
                 <Terminal size={16} />
+              </button>
+              <button
+                className={`inventory-tab ${activeTab === 'discord' ? 'active' : ''}`}
+                onClick={() => setActiveTab('discord')}
+                title="Discord"
+              >
+                <MessageCircle size={16} />
               </button>
             </div>
           </div>

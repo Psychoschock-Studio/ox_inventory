@@ -4,6 +4,7 @@ import inventoryReducer from './inventory';
 import tooltipReducer from './tooltip';
 import contextMenuReducer from './contextMenu';
 import commandsReducer from './commands';
+import discordReducer from './discord';
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     tooltip: tooltipReducer,
     contextMenu: contextMenuReducer,
     commands: commandsReducer,
+    discord: discordReducer,
   },
 });
 

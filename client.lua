@@ -1777,6 +1777,7 @@ RegisterNUICallback('actionButton', function(data, cb)
 end)
 
 local helpData = lib.load('data.commands') or { categories = {} }
+local discordData = lib.load('data.discord') or { servers = {} }
 
 local function getFavoriteCommands()
 	local favStr = GetResourceKvpString('ox_inventory:favoriteCommands')
@@ -1818,6 +1819,24 @@ end)
 RegisterNUICallback('setClipboard', function(data, cb)
 	if data.text then
 		lib.setClipboard(data.text)
+	end
+	cb(1)
+end)
+
+RegisterNUICallback('getDiscordServers', function(_, cb)
+	cb({
+		servers = discordData.servers or {},
+		joinButtonLabel = discordData.joinButtonLabel or 'Join the server'
+	})
+end)
+
+RegisterNUICallback('openUrl', function(data, cb)
+	if data.url then
+		SendNUIMessage({
+			type = 'OPEN_URL',
+			module = 'misc',
+			payload = { url = data.url }
+		})
 	end
 	cb(1)
 end)
