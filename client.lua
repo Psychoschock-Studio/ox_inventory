@@ -1878,6 +1878,33 @@ RegisterNUICallback('triggerJobEvent', function(data, cb)
 	cb(true)
 end)
 
+RegisterNUICallback('getWeeklyQuests', function(_, cb)
+	local result = lib.callback.await('pcore:weeklyQuests:get', false)
+	cb(result or { quests = {}, weekStart = '' })
+end)
+
+RegisterNUICallback('startWeeklyQuest', function(data, cb)
+	if not data.questId then
+		return cb(false)
+	end
+
+	local success = lib.callback.await('pcore:weeklyQuests:start', false, data.questId)
+	cb(success or false)
+end)
+
+RegisterNetEvent('ox_inventory:weeklyQuestCompleted', function(questId)
+	SendNUIMessage({
+		action = 'weeklyQuestCompleted',
+		data = questId
+	})
+end)
+
+RegisterNetEvent('ox_inventory:weeklyQuestsUpdated', function()
+	SendNUIMessage({
+		action = 'weeklyQuestsUpdated'
+	})
+end)
+
 lib.callback.register('ox_inventory:startCrafting', function(id, recipe)
 	recipe = CraftingBenches[id].items[recipe]
 

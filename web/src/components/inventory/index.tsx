@@ -17,10 +17,11 @@ import ActionButtons from './ActionButtons';
 import CommandsPanel from './CommandsPanel';
 import DiscordPanel from './DiscordPanel';
 import JobsPanel from './JobsPanel';
+import WeeklyQuestsPanel from './WeeklyQuestsPanel';
 import { fetchNui } from '../../utils/fetchNui';
-import { Package, Terminal, MessageCircle, Briefcase } from 'lucide-react';
+import { Package, Terminal, MessageCircle, Briefcase, Scroll } from 'lucide-react';
 
-type ActiveTab = 'inventory' | 'commands' | 'discord' | 'jobs';
+type ActiveTab = 'inventory' | 'commands' | 'discord' | 'jobs' | 'quests';
 
 const Inventory: React.FC = () => {
   const [inventoryVisible, setInventoryVisible] = useState(false);
@@ -72,8 +73,10 @@ const Inventory: React.FC = () => {
                 <CommandsPanel />
               ) : activeTab === 'discord' ? (
                 <DiscordPanel />
-              ) : (
+              ) : activeTab === 'jobs' ? (
                 <JobsPanel />
+              ) : (
+                <WeeklyQuestsPanel />
               )}
             </div>
             <div className="inventory-tabs">
@@ -104,6 +107,13 @@ const Inventory: React.FC = () => {
                 title="Jobs"
               >
                 <Briefcase size={16} />
+              </button>
+              <button
+                className={`inventory-tab ${activeTab === 'quests' ? 'active' : ''}`}
+                onClick={() => setActiveTab('quests')}
+                title="Quêtes Hebdomadaires"
+              >
+                <Scroll size={16} />
               </button>
             </div>
           </div>

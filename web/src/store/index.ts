@@ -6,6 +6,7 @@ import contextMenuReducer from './contextMenu';
 import commandsReducer from './commands';
 import discordReducer from './discord';
 import jobsReducer from './jobs';
+import weeklyQuestsReducer from './weeklyQuests';
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     commands: commandsReducer,
     discord: discordReducer,
     jobs: jobsReducer,
+    weeklyQuests: weeklyQuestsReducer,
   },
 });
 

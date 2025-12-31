@@ -1486,3 +1486,324 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
     margin: 0;
   }
 }
+
+.weekly-quests-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: $inventoryGridWidth;
+  height: $inventoryFullHeight;
+}
+
+.weekly-quests-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  
+  p {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin: 0;
+    font-family: $mainFont;
+    color: #fff;
+  }
+}
+
+.weekly-quests-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weekly-quests-icon {
+  color: #5dade2;
+}
+
+.weekly-quests-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: rgba(93, 173, 226, 0.15);
+  border-radius: 12px;
+  margin-right: 24px;
+  
+  svg {
+    color: #5dade2;
+  }
+  
+  span {
+    font-size: 10px;
+    font-weight: 600;
+    color: #5dade2;
+    font-family: $mainFont;
+  }
+}
+
+.weekly-quests-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background-color: $secondaryColor;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.weekly-quests-progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  span {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: $mainFont;
+    
+    &:last-child {
+      color: #5dade2;
+    }
+  }
+}
+
+.weekly-quests-progress-bar {
+  height: 6px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.weekly-quests-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #5dade2, #3498db);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.weekly-quests-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-right: 4px;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+    display: block;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $secondaryColor;
+    border-radius: 3px;
+    
+    &:hover {
+      background: $secondaryColorHighlight;
+    }
+  }
+}
+
+.weekly-quest-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background-color: $secondaryColor;
+  border-radius: 8px;
+  border-left: 3px solid #5dade2;
+  transition: all 200ms ease;
+  
+  &:hover {
+    background-color: $secondaryColorHighlight;
+  }
+  
+  &.completed {
+    border-left-color: #27ae60;
+    opacity: 0.7;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.weekly-quest-content {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.weekly-quest-status {
+  flex-shrink: 0;
+}
+
+.weekly-quest-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: rgba(93, 173, 226, 0.15);
+  border-radius: 6px;
+  color: #5dade2;
+}
+
+.weekly-quest-check {
+  color: #27ae60;
+}
+
+.weekly-quest-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.weekly-quest-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  font-family: $mainFont;
+  
+  &.strikethrough {
+    text-decoration: line-through;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.weekly-quest-description {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+  font-family: $mainFont;
+}
+
+.weekly-quest-start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  background-color: rgba(93, 173, 226, 0.15);
+  border: 1px solid rgba(93, 173, 226, 0.3);
+  cursor: pointer;
+  transition: all 200ms ease;
+  
+  span {
+    font-size: 11px;
+    font-weight: 600;
+    color: #5dade2;
+    font-family: $mainFont;
+  }
+  
+  svg {
+    color: #5dade2;
+  }
+  
+  &:hover {
+    background-color: rgba(93, 173, 226, 0.25);
+    border-color: rgba(93, 173, 226, 0.5);
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.weekly-quest-completed-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  background-color: rgba(39, 174, 96, 0.15);
+  border: 1px solid rgba(39, 174, 96, 0.3);
+  
+  span {
+    font-size: 11px;
+    font-weight: 600;
+    color: #27ae60;
+    font-family: $mainFont;
+  }
+  
+  svg {
+    color: #27ae60;
+  }
+}
+
+.weekly-quests-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  flex-shrink: 0;
+  
+  svg {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  
+  span {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: $mainFont;
+  }
+}
+
+.weekly-quests-loading,
+.weekly-quests-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  
+  svg {
+    color: rgba(255, 255, 255, 0.2);
+  }
+  
+  p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: $mainFont;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
