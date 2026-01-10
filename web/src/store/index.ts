@@ -7,6 +7,7 @@ import commandsReducer from './commands';
 import discordReducer from './discord';
 import jobsReducer from './jobs';
 import weeklyQuestsReducer from './weeklyQuests';
+import settingsReducer from './settings';
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     discord: discordReducer,
     jobs: jobsReducer,
     weeklyQuests: weeklyQuestsReducer,
+    settings: settingsReducer,
   },
 });
 

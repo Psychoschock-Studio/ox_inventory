@@ -1878,6 +1878,25 @@ RegisterNUICallback('triggerJobEvent', function(data, cb)
 	cb(true)
 end)
 
+RegisterNUICallback('getSettingsConfig', function(_, cb)
+	local result = exports.pcore2:GetUserPreferencesConfig()
+	cb(result or { categories = {} })
+end)
+
+RegisterNUICallback('getSettingsValues', function(_, cb)
+	local result = exports.pcore2:GetUserPreferencesValues()
+	cb(result or {})
+end)
+
+RegisterNUICallback('setSettingValue', function(data, cb)
+	if not data.categoryId or not data.settingId then
+		return cb(false)
+	end
+	
+	local success = exports.pcore2:SetUserPreferencesValue(data.categoryId, data.settingId, data.value)
+	cb(success or false)
+end)
+
 RegisterNUICallback('getWeeklyQuests', function(_, cb)
 	local result = lib.callback.await('pcore:weeklyQuests:get', false)
 	cb(result or { quests = {}, weekStart = '' })
