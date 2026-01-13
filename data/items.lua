@@ -248,4 +248,96 @@ return {
 			export = 'pcore2.useVehiclePart'
 		}
 	},
+
+	['handcuffs'] = {
+		label = 'Menottes',
+		weight = 350,
+		stack = false,
+		consume = 0,
+		durability = true,
+		client = {
+			export = 'pcore2.useHandcuffs'
+		}
+	},
+
+	['spike_strip'] = {
+		label = 'Hérisson',
+		weight = 5000,
+		stack = true,
+		consume = 1,
+		client = {
+			export = 'pcore2.useSpikeStrip'
+		}
+	},
+
+	['traffic_cone'] = {
+		label = 'Cône de signalisation',
+		weight = 1500,
+		stack = true,
+		consume = 0,
+		client = {
+			export = 'pcore2.useTrafficCone'
+		}
+	},
+
+	['police_barrier'] = {
+		label = 'Barrière de police',
+		weight = 8000,
+		stack = true,
+		consume = 0,
+		client = {
+			export = 'pcore2.usePoliceBarrier'
+		}
+	},
+
+	['evidence_bag'] = {
+		label = 'Sac à preuves',
+		weight = 50,
+		stack = true,
+		consume = 0,
+	},
+
+	['gsr_kit'] = {
+		label = 'Kit de test GSR',
+		weight = 200,
+		stack = true,
+		consume = 1,
+		client = {
+			export = 'pcore2.useGSRKit'
+		}
+	},
+
+	['dna_kit'] = {
+		label = 'Kit de prélèvement ADN',
+		weight = 200,
+		stack = true,
+		consume = 1,
+		client = {
+			export = 'pcore2.useDNAKit'
+		}
+	},
+
+	['evidence_gsr'] = {
+		label = 'Preuve GSR',
+		weight = 50,
+		stack = false,
+		consume = 0,
+	},
+
+	['evidence_dna'] = {
+		label = 'Preuve ADN',
+		weight = 50,
+		stack = false,
+		consume = 0,
+	},
+
+	['police_ticket'] = {
+		label = 'Contravention',
+		weight = 10,
+		stack = false,
+		consume = 0,
+		client = {
+			export = 'pcore2.viewPoliceTicket'
+		}
+	},
 }
