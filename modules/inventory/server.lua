@@ -473,6 +473,7 @@ end
 
 -- This should be handled by frameworks, but sometimes isn't or is exploitable in some way.
 local activeIdentifiers = {}
+local IS_DEV = GetConvarInt("sh_devEnv", 0) == 1
 
 local function hasActiveInventory(playerId, owner)
 	local activePlayer = activeIdentifiers[owner]
@@ -487,7 +488,7 @@ local function hasActiveInventory(playerId, owner)
 		if inventory then
 			local endpoint = GetPlayerEndpoint(activePlayer)
 
-			if endpoint then
+			if endpoint and not IS_DEV then
 				DropPlayer(playerId, ("Character identifier '%s' is already active."):format(owner))
 
                 -- Supposedly still getting stuck? Print info and hope somebody reports back (lol)
