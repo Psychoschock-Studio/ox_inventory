@@ -4,11 +4,13 @@ import type { RootState } from '.';
 export interface Setting {
   id: string;
   label: string;
-  type: 'checkbox' | 'slider';
-  defaultValue: any;
+  type: 'checkbox' | 'slider' | 'select' | 'color' | 'button';
+  defaultValue?: any;
   min?: number;
   max?: number;
   step?: number;
+  options?: Array<{ value: any; label: string }>;
+  action?: string;
 }
 
 export interface SettingCategory {

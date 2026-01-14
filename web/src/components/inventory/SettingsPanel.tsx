@@ -94,6 +94,22 @@ const SettingsPanel: React.FC = () => {
     }
   };
 
+  const handleResetHudColors = () => {
+    if (!isEnvBrowser()) {
+      fetchNui('resetHudColors').then(() => {
+        Promise.all([
+          fetchNui<{ categories: SettingCategory[] }>('getSettingsConfig'),
+          fetchNui<{ [categoryId: string]: { [settingId: string]: any } }>('getSettingsValues')
+        ]).then(([config, valuesData]) => {
+          dispatch(setSettings({
+            categories: config?.categories || [],
+            values: valuesData || {}
+          }));
+        });
+      });
+    }
+  };
+
   const getSettingValue = (categoryId: string, settingId: string, defaultValue: any) => {
     return values[categoryId]?.[settingId] ?? defaultValue;
   };
@@ -161,11 +177,23 @@ const SettingsPanel: React.FC = () => {
                 </button>
                 {isOpen && (
                   <div className="settings-category-content">
+                    {category.id === 'hudColors' && (
+                      <div className="settings-reset-colors">
+                        <button
+                          className="settings-reset-button"
+                          onClick={handleResetHudColors}
+                        >
+                          Réinitialiser toutes les couleurs
+                        </button>
+                      </div>
+                    )}
                     {category.settings.map((setting, settingIndex) => {
                       const currentValue = getSettingValue(category.id, setting.id, setting.defaultValue);
                       return (
                         <div key={settingIndex} className="settings-item">
-                          <div className="settings-item-label">{setting.label}</div>
+                          {setting.type !== 'button' && (
+                            <div className="settings-item-label">{setting.label}</div>
+                          )}
                           {setting.type === 'checkbox' ? (
                             <label className="settings-checkbox">
                               <input
@@ -188,6 +216,41 @@ const SettingsPanel: React.FC = () => {
                               />
                               <span className="settings-slider-value">{currentValue}</span>
                             </div>
+                          ) : setting.type === 'select' ? (
+                            <select
+                              className="settings-select"
+                              value={String(currentValue)}
+                              onChange={(e) => {
+                                const selectedValue = e.target.value;
+                                const option = setting.options?.find(opt => String(opt.value) === selectedValue);
+                                if (option) {
+                                  handleSettingChange(category.id, setting.id, option.value);
+                                }
+                              }}
+                            >
+                              {setting.options?.map((option, optIndex) => (
+                                <option key={optIndex} value={String(option.value)}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          ) : setting.type === 'color' ? (
+                            <div className="settings-color-wrapper">
+                              <input
+                                type="color"
+                                className="settings-color-input"
+                                value={currentValue || '#FFFFFF'}
+                                onChange={(e) => handleSettingChange(category.id, setting.id, e.target.value)}
+                              />
+                              <span className="settings-color-value">{currentValue || '#FFFFFF'}</span>
+                            </div>
+                          ) : setting.type === 'button' ? (
+                            <button
+                              className="settings-button"
+                              onClick={() => handleSettingChange(category.id, setting.id, setting.action || '')}
+                            >
+                              {setting.label}
+                            </button>
                           ) : null}
                         </div>
                       );

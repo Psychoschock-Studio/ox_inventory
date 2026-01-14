@@ -1897,6 +1897,11 @@ RegisterNUICallback('setSettingValue', function(data, cb)
 	cb(success or false)
 end)
 
+RegisterNUICallback('resetHudColors', function(_, cb)
+	local success = exports.pcore2:ResetHudColors()
+	cb(success or false)
+end)
+
 RegisterNUICallback('getWeeklyQuests', function(_, cb)
 	local result = lib.callback.await('pcore:weeklyQuests:get', false)
 	cb(result or { quests = {}, weekStart = '' })
