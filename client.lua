@@ -1771,9 +1771,14 @@ RegisterNUICallback('exit', function(_, cb)
 end)
 
 RegisterNUICallback('actionButton', function(data, cb)
-	-- Handle action button clicks
-	-- data.id contains the button ID (1-6)
-	cb(1)
+	local category = data.category
+	if not category then
+		cb(0)
+		return
+	end
+	
+	local result = exports.pcore2:ToggleClothingCategory(category)
+	cb(result and 1 or 0)
 end)
 
 local helpData = lib.load('data.commands') or { categories = {} }

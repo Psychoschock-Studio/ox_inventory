@@ -89,5 +89,20 @@
   "crafting_bench": "Table de fabrication",
   "open_crafting_bench": "Ouvrir la table de fabrication",
   "not_enough_durability": "%s n'a pas assez de durabilité",
-  "storage": "Stockage"
+  "storage": "Stockage",
+  "clothing_vest": "Gilet",
+  "clothing_top": "Haut",
+  "clothing_gloves": "Gants",
+  "clothing_visor": "Visière",
+  "clothing_hat": "Chapeau",
+  "clothing_shoes": "Chaussures",
+  "clothing_mask": "Masque",
+  "clothing_hair": "Coiffure",
+  "clothing_bag": "Sac",
+  "clothing_glasses": "Lunettes",
+  "clothing_ear": "Oreilles",
+  "clothing_neck": "Cou",
+  "clothing_watch": "Montre",
+  "clothing_bracelet": "Bracelet",
+  "clothing_pants": "Pantalon"
 }

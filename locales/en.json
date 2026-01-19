@@ -89,5 +89,20 @@
   "crafting_bench": "Crafting Bench",
   "open_crafting_bench": "Open Crafting Bench",
   "not_enough_durability": "%s does not have enough durability",
-  "storage": "Storage"
+  "storage": "Storage",
+  "clothing_vest": "Vest",
+  "clothing_top": "Top",
+  "clothing_gloves": "Gloves",
+  "clothing_visor": "Visor",
+  "clothing_hat": "Hat",
+  "clothing_shoes": "Shoes",
+  "clothing_mask": "Mask",
+  "clothing_hair": "Hair",
+  "clothing_bag": "Bag",
+  "clothing_glasses": "Glasses",
+  "clothing_ear": "Ear",
+  "clothing_neck": "Neck",
+  "clothing_watch": "Watch",
+  "clothing_bracelet": "Bracelet",
+  "clothing_pants": "Pants"
 }

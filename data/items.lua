@@ -340,4 +340,154 @@ return {
 			export = 'pcore2.viewPoliceTicket'
 		}
 	},
+
+	['clothing_hat'] = {
+		label = 'Chapeau',
+		weight = 100,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_top'] = {
+		label = 'Haut',
+		weight = 300,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_pants'] = {
+		label = 'Pantalon',
+		weight = 250,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_shoes'] = {
+		label = 'Chaussures',
+		weight = 400,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_mask'] = {
+		label = 'Masque',
+		weight = 50,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_glasses'] = {
+		label = 'Lunettes',
+		weight = 50,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_ear'] = {
+		label = 'Boucles d\'oreilles',
+		weight = 20,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_watch'] = {
+		label = 'Montre',
+		weight = 80,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_bracelet'] = {
+		label = 'Bracelet',
+		weight = 30,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_gloves'] = {
+		label = 'Gants',
+		weight = 100,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_vest'] = {
+		label = 'Gilet',
+		weight = 200,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_bag'] = {
+		label = 'Sac',
+		weight = 150,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_visor'] = {
+		label = 'Visière',
+		weight = 80,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_neck'] = {
+		label = 'Accessoire de cou',
+		weight = 50,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
+
+	['clothing_hair'] = {
+		label = 'Coiffure',
+		weight = 10,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipClothingItem'
+		}
+	},
 }
