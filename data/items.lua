@@ -490,4 +490,14 @@ return {
 			export = 'pcore2.equipClothingItem'
 		}
 	},
+
+	['outfit'] = {
+		label = 'Tenue',
+		weight = 500,
+		stack = false,
+		consume = 1,
+		client = {
+			export = 'pcore2.equipOutfit'
+		}
+	},
 }

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { fetchNui } from '../../utils/fetchNui';
 import { Locale } from '../../store/locale';
-import { 
-  Shirt, 
+import {
+  Shirt,
   HardHat, 
   Footprints, 
   UserX, 
-  Glasses, 
+  Glasses,
   Headphones, 
   Clock, 
   Hand, 
-  Backpack, 
+  Backpack,
   Scissors,
   Circle,
   CircleDot,
