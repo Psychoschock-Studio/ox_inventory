@@ -19,6 +19,13 @@ RegisterNetEvent('ox_inventory:clearWeapons', function()
 	Weapon.ClearAll(currentWeapon)
 end)
 
+RegisterNetEvent('ox_inventory:setThemeColor', function(r, g, b)
+	SendNUIMessage({
+		action = 'setThemeColor',
+		data = { r = r, g = g, b = b }
+	})
+end)
+
 local StashTarget
 
 exports('setStashTarget', function(id, owner)

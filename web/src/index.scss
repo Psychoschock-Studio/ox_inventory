@@ -11,6 +11,13 @@ $btnUseColor: #212f3c;
 $btnGiveColor: #253728;
 $quantityBoxColor: #2f2f2f;
 
+:root {
+  --theme-accent: #5dade2;
+  --theme-accent-light: #85c1e9;
+  --theme-accent-dark: #3498db;
+  --theme-accent-rgb: 93, 173, 226;
+}
+
 $gridCols: 5;
 $gridRows: 4;
 $gridSize: 9vh;
@@ -235,10 +242,10 @@ button:active {
   
   .inventory-control-button-use {
     background-color: $btnUseColor !important;
-    color: #5dade2 !important;
+    color: var(--theme-accent) !important;
     &:hover {
       background-color: #2a4052 !important;
-      color: #85c1e9 !important;
+      color: var(--theme-accent-light) !important;
     }
   }
   
@@ -809,8 +816,8 @@ button:active {
   }
   
   &.active {
-    color: #5dade2;
-    background-color: rgba(93, 173, 226, 0.15);
+    color: var(--theme-accent);
+    background-color: rgba(var(--theme-accent-rgb), 0.15);
   }
   
   &:active {
@@ -953,9 +960,9 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
   justify-content: center;
   width: 24px;
   height: 24px;
-  background-color: rgba(93, 173, 226, 0.15);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 6px;
-  color: #5dade2;
+  color: var(--theme-accent);
 }
 
 .commands-category-title {
@@ -968,11 +975,11 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
 
 .commands-category-count {
   padding: 2px 8px;
-  background-color: rgba(93, 173, 226, 0.15);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 10px;
   font-size: 10px;
   font-weight: 600;
-  color: #5dade2;
+  color: var(--theme-accent);
 }
 
 .commands-category-content {
@@ -1005,12 +1012,12 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
 
 .commands-item-id {
   padding: 3px 8px;
-  background-color: rgba(93, 173, 226, 0.15);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 4px;
   font-family: monospace;
   font-size: 11px;
   font-weight: 600;
-  color: #5dade2;
+  color: var(--theme-accent);
 }
 
 .commands-item-actions {
@@ -1214,9 +1221,9 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
   justify-content: center;
   width: 36px;
   height: 36px;
-  background-color: rgba(93, 173, 226, 0.2);
+  background-color: rgba(var(--theme-accent-rgb), 0.2);
   border-radius: 8px;
-  color: #5dade2;
+  color: var(--theme-accent);
   flex-shrink: 0;
   
   svg {
@@ -1260,14 +1267,14 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
 .discord-server-join {
   padding: 10px;
   border-radius: 8px;
-  background-color: rgba(93, 173, 226, 0.15);
-  border: 1px solid rgba(93, 173, 226, 0.3);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.3);
   text-align: center;
   
   span {
     font-size: 11px;
     font-weight: 600;
-    color: #5dade2;
+    color: var(--theme-accent);
     font-family: $mainFont;
   }
 }
@@ -1407,9 +1414,9 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
   justify-content: center;
   width: 24px;
   height: 24px;
-  background-color: rgba(93, 173, 226, 0.15);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 6px;
-  color: #5dade2;
+  color: var(--theme-accent);
 }
 
 .jobs-category-title {
@@ -1422,11 +1429,11 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
 
 .jobs-category-count {
   padding: 2px 8px;
-  background-color: rgba(93, 173, 226, 0.15);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 10px;
   font-size: 10px;
   font-weight: 600;
-  color: #5dade2;
+  color: var(--theme-accent);
 }
 
 .jobs-category-content {
@@ -1497,25 +1504,25 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
   width: 100%;
   padding: 8px;
   border-radius: 6px;
-  background-color: rgba(93, 173, 226, 0.15);
-  border: 1px solid rgba(93, 173, 226, 0.3);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.3);
   cursor: pointer;
   transition: all 200ms ease;
   
   span {
     font-size: 10px;
     font-weight: 600;
-    color: #5dade2;
+    color: var(--theme-accent);
     font-family: $mainFont;
   }
   
   svg {
-    color: #5dade2;
+    color: var(--theme-accent);
   }
   
   &:hover {
-    background-color: rgba(93, 173, 226, 0.25);
-    border-color: rgba(93, 173, 226, 0.5);
+    background-color: rgba(var(--theme-accent-rgb), 0.25);
+    border-color: rgba(var(--theme-accent-rgb), 0.5);
   }
   
   &:active {
@@ -1570,7 +1577,7 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
 }
 
 .weekly-quests-icon {
-  color: #5dade2;
+  color: var(--theme-accent);
 }
 
 .weekly-quests-date {
@@ -1578,18 +1585,18 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background-color: rgba(93, 173, 226, 0.15);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 12px;
   margin-right: 24px;
   
   svg {
-    color: #5dade2;
+    color: var(--theme-accent);
   }
   
   span {
     font-size: 10px;
     font-weight: 600;
-    color: #5dade2;
+    color: var(--theme-accent);
     font-family: $mainFont;
   }
 }
@@ -1616,7 +1623,7 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
     font-family: $mainFont;
     
     &:last-child {
-      color: #5dade2;
+      color: var(--theme-accent);
     }
   }
 }
@@ -1630,7 +1637,7 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
 
 .weekly-quests-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #5dade2, #3498db);
+  background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-dark));
   border-radius: 3px;
   transition: width 0.3s ease;
 }
@@ -1671,7 +1678,7 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
   padding: 12px;
   background-color: $secondaryColor;
   border-radius: 8px;
-  border-left: 3px solid #5dade2;
+  border-left: 3px solid var(--theme-accent);
   transition: all 200ms ease;
   
   &:hover {
@@ -1704,9 +1711,9 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
   justify-content: center;
   width: 28px;
   height: 28px;
-  background-color: rgba(93, 173, 226, 0.15);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 6px;
-  color: #5dade2;
+  color: var(--theme-accent);
 }
 
 .weekly-quest-check {
@@ -1748,25 +1755,25 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
   width: 100%;
   padding: 8px;
   border-radius: 6px;
-  background-color: rgba(93, 173, 226, 0.15);
-  border: 1px solid rgba(93, 173, 226, 0.3);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
+  border: 1px solid rgba(var(--theme-accent-rgb), 0.3);
   cursor: pointer;
   transition: all 200ms ease;
   
   span {
     font-size: 11px;
     font-weight: 600;
-    color: #5dade2;
+    color: var(--theme-accent);
     font-family: $mainFont;
   }
   
   svg {
-    color: #5dade2;
+    color: var(--theme-accent);
   }
   
   &:hover {
-    background-color: rgba(93, 173, 226, 0.25);
-    border-color: rgba(93, 173, 226, 0.5);
+    background-color: rgba(var(--theme-accent-rgb), 0.25);
+    border-color: rgba(var(--theme-accent-rgb), 0.5);
     transform: translateY(-1px);
   }
   
@@ -1966,9 +1973,9 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
   justify-content: center;
   width: 24px;
   height: 24px;
-  background-color: rgba(93, 173, 226, 0.15);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 6px;
-  color: #5dade2;
+  color: var(--theme-accent);
 }
 
 .settings-category-title {
@@ -1981,11 +1988,11 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
 
 .settings-category-count {
   padding: 2px 8px;
-  background-color: rgba(93, 173, 226, 0.15);
+  background-color: rgba(var(--theme-accent-rgb), 0.15);
   border-radius: 10px;
   font-size: 10px;
   font-weight: 600;
-  color: #5dade2;
+  color: var(--theme-accent);
 }
 
 .settings-category-content {
@@ -2026,7 +2033,7 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
     height: 0;
     
     &:checked + .settings-checkbox-slider {
-      background-color: #5dade2;
+      background-color: var(--theme-accent);
       
       &:before {
         transform: translateX(20px);
@@ -2079,12 +2086,12 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #5dade2;
+    background: var(--theme-accent);
     cursor: pointer;
     transition: 200ms;
     
     &:hover {
-      background: #4a9cd1;
+      background: var(--theme-accent-dark);
       transform: scale(1.1);
     }
   }
@@ -2093,13 +2100,13 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #5dade2;
+    background: var(--theme-accent);
     cursor: pointer;
     border: none;
     transition: 200ms;
     
     &:hover {
-      background: #4a9cd1;
+      background: var(--theme-accent-dark);
       transform: scale(1.1);
     }
   }
@@ -2108,7 +2115,7 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
 .settings-slider-value {
   font-size: 11px;
   font-weight: 600;
-  color: #5dade2;
+  color: var(--theme-accent);
   font-family: $mainFont;
   min-width: 30px;
   text-align: right;
@@ -2204,7 +2211,7 @@ $inventoryFullHeight: calc(2 * #{$containerSize} + 2 * 19px + 2 * 21px + 40px + 
 .settings-color-value {
   font-size: 11px;
   font-weight: 600;
-  color: #5dade2;
+  color: var(--theme-accent);
   font-family: $mainFont;
   min-width: 70px;
   text-align: right;
