@@ -26,6 +26,13 @@ debugData([
         items: [
           {
             slot: 1,
+            name: 'water',
+            weight: 100,
+            count: 1,
+            metadata: { description: 'Common item (no rarity effect)' },
+          },
+          {
+            slot: 2,
             name: 'weed',
             weight: 3000,
             metadata: {
@@ -37,18 +44,10 @@ debugData([
             },
             count: 5,
           },
-          { slot: 2, name: 'lockpick', weight: 0, count: 1, metadata: { durability: 75 } },
-          { slot: 3, name: 'advancedkit', weight: 100, count: 12, metadata: { type: 'Mechanic' } },
+          { slot: 3, name: 'lockpick', weight: 0, count: 1, metadata: { durability: 75 } },
+          { slot: 4, name: 'advancedkit', weight: 100, count: 12, metadata: { type: 'Mechanic' } },
           {
-            slot: 4,
-            name: 'water',
-            weight: 100,
-            count: 1,
-            metadata: { description: 'Generic item description' },
-          },
-          { slot: 5, name: 'water', weight: 100, count: 1 },
-          {
-            slot: 6,
+            slot: 5,
             name: 'backwoods',
             weight: 100,
             count: 1,
@@ -108,6 +107,20 @@ const App: React.FC = () => {
 
   useNuiEvent('closeInventory', () => {
     manager.dispatch({ type: 'dnd-core/END_DRAG' });
+  });
+
+  useNuiEvent<{ name: string; item: typeof Items[string] }>('itemRegistered', ({ name, item }) => {
+    Items[name] = item;
+  });
+
+  useNuiEvent<{ name: string; item: typeof Items[string] }>('itemUpdated', ({ name, item }) => {
+    if (Items[name]) {
+      Items[name] = { ...Items[name]!, ...item };
+    }
+  });
+
+  useNuiEvent<{ name: string }>('itemRemoved', ({ name }) => {
+    delete Items[name];
   });
 
   return (

@@ -119,22 +119,37 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
 
   const refs = useMergeRefs([connectRef, ref]);
 
+  const getRarity = () => {
+    if (!isSlotWithItem(item)) return 'common';
+    const itemData = Items[item.name];
+    return itemData?.rarity || 'common';
+  };
+
+  const rarity = getRarity();
+
   return (
     <div
       ref={refs}
       onContextMenu={handleContext}
       onClick={handleClick}
-      className="inventory-slot"
+      className={`inventory-slot ${isSlotWithItem(item) && rarity !== 'common' ? `item-rarity-${rarity}` : ''}`}
       style={{
         filter:
           !canPurchaseItem(item, { type: inventoryType, groups: inventoryGroups }) || !canCraftItem(item, inventoryType)
             ? 'brightness(80%) grayscale(100%)'
             : undefined,
         opacity: isDragging ? 0.4 : 1.0,
-        backgroundImage: `url(${item?.name ? getItemUrl(item as SlotWithItem) : 'none'}`,
         border: isOver ? '1px dashed rgba(255,255,255,0.4)' : '',
       }}
     >
+      {isSlotWithItem(item) && (
+        <div
+          className="inventory-slot-image"
+          style={{
+            backgroundImage: `url(${getItemUrl(item as SlotWithItem) || 'none'}`,
+          }}
+        />
+      )}
       {isSlotWithItem(item) && (
         <div
           className="item-slot-wrapper"

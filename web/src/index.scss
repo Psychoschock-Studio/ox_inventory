@@ -78,6 +78,7 @@ input[type='number']::-webkit-outer-spin-button {
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 99999;
 }
 
 .context-menu-item  {
@@ -415,14 +416,63 @@ button:active {
 // inventory slots
 .inventory-slot {
   background-color: $secondaryColor;
-  background-repeat: no-repeat;
-  background-position: center;
   border-radius: 10px;
-  image-rendering: -webkit-optimize-contrast;
   position: relative;
-  background-size: 6.5vh;
   color: $textColor;
   border: none;
+  overflow: hidden;
+  
+  &.item-rarity-uncommon::before,
+  &.item-rarity-rare::before,
+  &.item-rarity-epic::before,
+  &.item-rarity-legendary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 10px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+    filter: blur(12px);
+  }
+  
+  &.item-rarity-uncommon::before {
+    background: radial-gradient(circle at center, rgba(50, 205, 50, 0.75) 0%, rgba(50, 205, 50, 0.5) 50%, transparent 70%);
+    box-shadow: inset 0 0 22px rgba(50, 205, 50, 0.6);
+    opacity: 0.45;
+  }
+  
+  &.item-rarity-rare::before {
+    background: radial-gradient(circle at center, rgba(30, 144, 255, 0.8) 0%, rgba(30, 144, 255, 0.4) 50%, transparent 70%);
+    box-shadow: inset 0 0 20px rgba(30, 144, 255, 0.5);
+  }
+  
+  &.item-rarity-epic::before {
+    background: radial-gradient(circle at center, rgba(138, 43, 226, 0.8) 0%, rgba(138, 43, 226, 0.4) 50%, transparent 70%);
+    box-shadow: inset 0 0 20px rgba(138, 43, 226, 0.5);
+  }
+  
+  &.item-rarity-legendary::before {
+    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.8) 0%, rgba(255, 140, 0, 0.4) 50%, transparent 70%);
+    box-shadow: inset 0 0 25px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.inventory-slot-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 6.5vh;
+  image-rendering: -webkit-optimize-contrast;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .inventory-slot-label-box {
@@ -449,7 +499,13 @@ button:active {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: auto;
   p {
     font-size: 12px;
   }
@@ -521,6 +577,7 @@ button:active {
   border-radius: 10px;
   border: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 99999;
   p {
     font-size: 12px;
     font-weight: 400;

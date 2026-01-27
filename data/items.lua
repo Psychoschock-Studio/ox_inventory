@@ -3,6 +3,7 @@ return {
 		label = 'Test Burger',
 		weight = 220,
 		degrade = 60,
+		rarity = 'rare',  -- 'common', 'uncommon', 'rare', 'epic', or 'legendary'
 		client = {
 			image = 'burger_chicken.png',
 			status = { hunger = 200000 },
