@@ -2,34 +2,15 @@ return {
     joinButtonLabel = 'Join the activity',
     categories = {
         {
-            title = 'Emergency Services',
+            title = 'Activities',
             jobs = {
                 {
-                    id = 'police',
-                    name = 'Police Officer',
-                    description = 'Protect and serve the community',
-                    image = 'https://i.imgur.com/example1.png',
-                    event = 'jobs:joinPolice',
-                    args = { rank = 'recruit' }
-                },
-                {
-                    id = 'ems',
-                    name = 'Paramedic',
-                    description = 'Save lives and provide medical assistance',
-                    image = 'https://i.imgur.com/example2.png',
-                    eventServer = 'jobs:joinEMS',
-                    args = { department = 'hospital' }
-                }
-            }
-        },
-        {
-            title = 'Civilian Jobs',
-            jobs = {
-                {
-                    id = 'mechanic',
-                    name = 'Mechanic',
-                    description = 'Repair and customize vehicles',
-                    event = 'jobs:joinMechanic',
+                    id = 'garbage_activity',
+                    name = "Ramassage de Poubelles",
+                    description = 'Collectez les ordures de la ville avec votre équipe.',
+                    image = 'nui://pcore2/ui/assets/activities/garbage.png',
+                    type = 'activity',
+                    eventServer = true,
                     args = {}
                 }
             }

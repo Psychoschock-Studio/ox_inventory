@@ -1882,11 +1882,7 @@ RegisterNUICallback('triggerJobEvent', function(data, cb)
 		return cb(false)
 	end
 
-	if job.eventServer then
-		TriggerServerEvent(job.eventServer, job.args or {})
-	elseif job.event then
-		TriggerEvent(job.event, job.args or {})
-	end
+	TriggerServerEvent('pcore:activity:join', job.id, job.args or {})
 
 	cb(true)
 end)
