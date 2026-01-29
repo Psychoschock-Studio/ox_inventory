@@ -1856,8 +1856,28 @@ RegisterNUICallback('openUrl', function(data, cb)
 end)
 
 RegisterNUICallback('getJobs', function(_, cb)
+	local tblCategorizedActivities = lib.callback.await('pcore:activities:getVisibleActivityJobs', false) or {}
+
+	local tblCategories = {}
+	for _, category in ipairs(jobsData.categories or {}) do
+		local strCategoryId = category.id
+		local tblJobs = {}
+
+		if strCategoryId and tblCategorizedActivities[strCategoryId] then
+			tblJobs = tblCategorizedActivities[strCategoryId]
+		end
+
+		if #tblJobs > 0 then
+			tblCategories[#tblCategories + 1] = {
+				title = category.title,
+				id = category.id,
+				jobs = tblJobs
+			}
+		end
+	end
+
 	cb({
-		categories = jobsData.categories or {},
+		categories = tblCategories,
 		joinButtonLabel = jobsData.joinButtonLabel or 'Join the activity'
 	})
 end)
@@ -1876,6 +1896,19 @@ RegisterNUICallback('triggerJobEvent', function(data, cb)
 			end
 		end
 		if job then break end
+	end
+
+	if not job then
+		local tblCategorizedActivities = lib.callback.await('pcore:activities:getVisibleActivityJobs', false) or {}
+		for strCategoryId, tblActivities in pairs(tblCategorizedActivities) do
+			for _, activityData in ipairs(tblActivities) do
+				if activityData.id == data.jobId then
+					job = activityData
+					break
+				end
+			end
+			if job then break end
+		end
 	end
 
 	if not job then
