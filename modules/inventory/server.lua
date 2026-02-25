@@ -1514,10 +1514,24 @@ local function CustomDrop(prefix, items, coords, slots, maxWeight, instance, mod
 
 	inventory.items, inventory.weight = generateItems(inventory, 'drop', items)
 	inventory.coords = coords
+	local itemsList = {}
+	if items then
+		for slot = 1, #items do
+			local v = items[slot]
+			if v and v[1] then
+				local itemData = Items(v[1])
+				itemsList[slot] = { name = v[1], model = (itemData and itemData.model) or (slot == 1 and model) }
+			end
+		end
+	end
+	if not next(itemsList) and model then
+		itemsList[1] = { name = nil, model = model }
+	end
 	Inventory.Drops[dropId] = {
 		coords = inventory.coords,
 		instance = instance,
 		model = model,
+		items = itemsList
 	}
 
 	TriggerClientEvent('ox_inventory:createDrop', -1, dropId, Inventory.Drops[dropId])
@@ -1540,9 +1554,17 @@ exports('CreateDropFromPlayer', function(playerId)
 
 	local coords = GetEntityCoords(GetPlayerPed(playerId))
 	inventory.coords = vec3(coords.x, coords.y, coords.z-0.2)
+	local itemsList = {}
+	for slot, slotData in pairs(playerInventory.items) do
+		if slotData and slotData.name then
+			local itemData = Items(slotData.name)
+			itemsList[slot] = { name = slotData.name, model = slotData.metadata?.model or (itemData and itemData.model) }
+		end
+	end
 	Inventory.Drops[dropId] = {
 		coords = inventory.coords,
-		instance = Player(playerId).state.instance
+		instance = Player(playerId).state.instance,
+		items = itemsList
 	}
 
 	Inventory.Clear(playerInventory)
@@ -1552,6 +1574,20 @@ exports('CreateDropFromPlayer', function(playerId)
 end)
 
 local TriggerEventHooks = require 'modules.hooks.server'
+
+local function refreshDropData(inv)
+	if inv.type ~= 'drop' or not Inventory.Drops[inv.id] then return end
+	local itemsList = {}
+	for slot, slotData in pairs(inv.items) do
+		if slotData and slotData.name then
+			local itemData = Items(slotData.name)
+			itemsList[slot] = { name = slotData.name, model = slotData.metadata?.model or (itemData and itemData.model) }
+		end
+	end
+	Inventory.Drops[inv.id].items = itemsList
+	Inventory.Drops[inv.id].coords = inv.coords
+	TriggerClientEvent('ox_inventory:updateDrop', -1, inv.id, Inventory.Drops[inv.id])
+end
 
 ---@class SwapSlotData
 ---@field count number
@@ -1613,7 +1649,10 @@ local function dropItem(source, playerInventory, fromData, data)
 	if not inventory then return end
 
 	inventory.coords = data.coords
-	Inventory.Drops[dropId] = {coords = inventory.coords, instance = data.instance}
+	local itemData = Items(toData.name)
+	local resolvedModel = toData.metadata?.model or (itemData and itemData.model)
+	local itemsList = { [data.toSlot] = { name = toData.name, model = resolvedModel } }
+	Inventory.Drops[dropId] = { coords = inventory.coords, instance = data.instance, items = itemsList }
 	playerInventory.changed = true
 
 	TriggerClientEvent('ox_inventory:createDrop', -1, dropId, Inventory.Drops[dropId], playerInventory.open and source, slot)
@@ -1634,6 +1673,128 @@ local function dropItem(source, playerInventory, fromData, data)
 		}
 	}
 end
+
+lib.callback.register('ox_inventory:prepareThrow', function(source, data)
+	if not data or not data.fromSlot or not data.count or data.count < 1 then return false end
+	local playerInventory = Inventory(source)
+	if not playerInventory then return false end
+	local fromData = playerInventory.items[data.fromSlot]
+	if not fromData or fromData.name == nil or fromData.count < data.count then return false end
+	local itemData = Items(fromData.name)
+	if not itemData then return false end
+	if itemData.throwable == false then return false end
+	local resolvedModel = fromData.metadata?.model or (itemData and itemData.model)
+	if not resolvedModel and itemData.client and itemData.client.prop and itemData.client.prop.model then
+		resolvedModel = itemData.client.prop.model
+	end
+	return true, resolvedModel
+end)
+
+lib.callback.register('ox_inventory:throwItem', function(source, data)
+	if not data or not data.fromSlot or not data.count or data.count < 1 then return false end
+	local playerInventory = Inventory(source)
+	if not playerInventory then return false end
+	local fromData = playerInventory.items[data.fromSlot]
+	if not fromData or fromData.name == nil or fromData.count < data.count then return false end
+	local itemData = Items(fromData.name)
+	if not itemData then return false end
+	if itemData.throwable == false then return false end
+	if not TriggerEventHooks('throwItem', {
+		source = source,
+		fromInventory = playerInventory.id,
+		fromSlot = fromData,
+		item = fromData,
+		count = data.count,
+	}) then return false end
+	if not Inventory.RemoveItem(playerInventory, fromData.name, data.count, fromData.metadata, data.fromSlot) then return false end
+	local resolvedModel = fromData.metadata?.model or (itemData and itemData.model)
+	if not resolvedModel and itemData.client and itemData.client.prop and itemData.client.prop.model then
+		resolvedModel = itemData.client.prop.model
+	end
+	Player(source).state.isThrowing = { model = resolvedModel, itemName = fromData.name, slot = data.fromSlot }
+	SetTimeout(250, function()
+		Player(source).state.isThrowing = nil
+	end)
+	if server.syncInventory then server.syncInventory(playerInventory) end
+	return true, { name = fromData.name, count = data.count, metadata = fromData.metadata or {} }
+end)
+
+RegisterNetEvent('ox_inventory:throwLanded', function(itemData, coords)
+	local source = source
+	if not itemData or not itemData.name or not itemData.count or itemData.count < 1 or not coords then return end
+	local itemDef = Items(itemData.name)
+	if not itemDef then return end
+	local dropId = generateInvId('drop')
+	local toData = { name = itemData.name, count = itemData.count, slot = 1, metadata = itemData.metadata or {} }
+	toData.weight = Inventory.SlotWeight(itemDef, toData)
+	if toData.weight > shared.dropweight then return end
+	local inventory = Inventory.Create(dropId, ('Drop %s'):format(dropId:gsub('%D', '')), 'drop', shared.dropslots, toData.weight, shared.dropweight, false, { [1] = toData })
+	if not inventory then return end
+	inventory.coords = vec3(coords.x, coords.y, coords.z)
+	local resolvedModel = (itemData.metadata and itemData.metadata.model) or (itemDef and itemDef.model)
+	if not resolvedModel and itemDef.client and itemDef.client.prop and itemDef.client.prop.model then
+		resolvedModel = itemDef.client.prop.model
+	end
+	Inventory.Drops[dropId] = { coords = inventory.coords, instance = Player(source).state.instance, items = { [1] = { name = itemData.name, model = resolvedModel } } }
+	TriggerClientEvent('ox_inventory:createDrop', -1, dropId, Inventory.Drops[dropId])
+end)
+
+local ThrownWeapons = {}
+
+RegisterNetEvent('ox_inventory:ballThrowStarted', function()
+	TriggerClientEvent('ox_inventory:hideBallProjectilesForDuration', -1)
+end)
+
+RegisterNetEvent('ox_inventory:throwWeapon', function(data)
+	local source = source
+	if not data or not data.weapon or not data.net_id then return end
+	local playerInventory = Inventory(source)
+	if not playerInventory then return end
+	local weapon = Inventory.GetCurrentWeapon(playerInventory)
+	if not weapon or weapon.name ~= data.weapon then return end
+	local itemDef = Items(weapon.name)
+	if not itemDef or not itemDef.weapon then return end
+	if not Inventory.RemoveItem(playerInventory, weapon.name, 1, weapon.metadata, weapon.slot) then return end
+	playerInventory.weapon = nil
+	local weaponID
+	repeat
+		weaponID = os.time() .. '_' .. math.random(1000, 9999)
+	until not ThrownWeapons[weaponID]
+	ThrownWeapons[weaponID] = {
+		weapon = weapon.name,
+		slot = weapon.slot,
+		metadata = weapon.metadata or {},
+		net_id = data.net_id,
+	}
+	if server.syncInventory then server.syncInventory(playerInventory) end
+	TriggerClientEvent('ox_inventory:setThrownWeaponData', -1, weaponID, { net_id = data.net_id })
+end)
+
+RegisterNetEvent('ox_inventory:pickupWeapon', function(weaponID)
+	local source = source
+	if not ThrownWeapons[weaponID] then return end
+	local data = ThrownWeapons[weaponID]
+	local entity = NetworkGetEntityFromNetworkId(data.net_id)
+	if entity and entity ~= 0 then
+		DeleteEntity(entity)
+	end
+	local playerInventory = Inventory(source)
+	if not playerInventory then return end
+	Inventory.AddItem(playerInventory, data.weapon, 1, data.metadata, data.slot)
+	ThrownWeapons[weaponID] = nil
+	if server.syncInventory then server.syncInventory(playerInventory) end
+	TriggerClientEvent('ox_inventory:setThrownWeaponData', -1, weaponID, nil)
+end)
+
+AddEventHandler('onResourceStop', function(name)
+	if GetCurrentResourceName() ~= name then return end
+	for _, v in pairs(ThrownWeapons) do
+		local entity = NetworkGetEntityFromNetworkId(v.net_id)
+		if entity and entity ~= 0 then
+			DeleteEntity(entity)
+		end
+	end
+end)
 
 local activeSlots = {}
 
@@ -1908,6 +2069,9 @@ lib.callback.register('ox_inventory:swapItems', function(source, data)
 
 			if fromInventory.changed ~= nil then fromInventory.changed = true end
 			if toInventory.changed ~= nil then toInventory.changed = true end
+
+			if toInventory.type == 'drop' then refreshDropData(toInventory) end
+			if fromInventory.type == 'drop' then refreshDropData(fromInventory) end
 
             CreateThread(function()
                 if sameInventory then

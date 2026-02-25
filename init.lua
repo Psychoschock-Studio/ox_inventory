@@ -95,6 +95,7 @@ else
         disableweapons = GetConvarInt('inventory:disableweapons', 0) == 1,
         disablesetupnotification = GetConvarInt('inventory:disablesetupnotification', 0) == 1,
         enablestealcommand = GetConvarInt('inventory:enablestealcommand', 1) == 1,
+        throwkey = GetConvar('inventory:throwkey', 'e'),
     }
 
     local ignoreweapons = table.create(0, (client.ignoreweapons and #client.ignoreweapons or 0) + 3)
@@ -104,11 +105,13 @@ else
         ignoreweapons[tonumber(weapon) or joaat(weapon)] = true
     end
 
-    ignoreweapons[`WEAPON_UNARMED`] = true
+	ignoreweapons[`WEAPON_UNARMED`] = true
     ignoreweapons[`WEAPON_HANDCUFFS`] = true
     ignoreweapons[`WEAPON_GARBAGEBAG`] = true
     ignoreweapons[`OBJECT`] = true
     ignoreweapons[`WEAPON_HOSE`] = true
+    ignoreweapons[`WEAPON_SNOWBALL`] = true
+    ignoreweapons[`WEAPON_BALL`] = true
 
     client.ignoreweapons = ignoreweapons
 

@@ -2,6 +2,7 @@ if not lib then return end
 
 require 'modules.bridge.client'
 require 'modules.interface.client'
+require 'modules.throw.client'
 
 local Utils = require 'modules.utils.client'
 local Weapon = require 'modules.weapon.client'
@@ -1027,63 +1028,87 @@ RegisterNetEvent('ox_inventory:inventoryConfiscated', function(message)
 end)
 
 
----@param point CPoint
-local function nearbyDrop(point)
-	if not point.instance or point.instance == currentInstance then
-        DrawMarker(client.dropmarker.type, point.coords.x, point.coords.y, point.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, client.dropmarker.scale[1], client.dropmarker.scale[2], client.dropmarker.scale[3],
-        ---@diagnostic disable-next-line: param-type-mismatch
-        client.dropmarker.colour[1], client.dropmarker.colour[2], client.dropmarker.colour[3], 222, false, false, 0, true, false, false, false)
-    end
+local dropSlotOffsetX = 0.25
+local dropSlotOffsetY = 0.2
+
+local function resolveDropModel(model, point)
+	if not model then return client.dropmodel end
+	local hash = type(model) == 'string' and joaat(model) or model
+	if IsModelValid(hash) or IsModelInCdimage(hash) then return hash end
+	return client.dropmodel
 end
 
 ---@param point CPoint
 local function onEnterDrop(point)
-	if not point.instance or point.instance == currentInstance and not point.entity then
-		local model = point.model or client.dropmodel
-
-        -- Prevent breaking inventory on invalid point.model instead use default client.dropmodel
-        if not IsModelValid(model) and not IsModelInCdimage(model) then
-            model = client.dropmodel
-        end
+	if point.instance and point.instance ~= currentInstance then return end
+	if point.entities then return end
+	local items = point.items or (point.model and { [1] = { name = nil, model = point.model } } or { [1] = { name = nil, model = nil } })
+	local slots = {}
+	for slot in pairs(items) do slots[#slots + 1] = slot end
+	table.sort(slots)
+	point.entities = {}
+	point.interactionIds = {}
+	local pcore2Available = GetResourceState('pcore2') == 'started'
+	for i, slot in ipairs(slots) do
+		local itemInfo = items[slot]
+		local model = resolveDropModel(itemInfo.model, point)
 		lib.requestModel(model)
-
-		local entity = CreateObject(model, point.coords.x, point.coords.y, point.coords.z, false, true, true)
-
+		local offsetX = (i - 1) * dropSlotOffsetX
+		local offsetY = (i - 1) * dropSlotOffsetY
+		local x = point.coords.x + offsetX
+		local y = point.coords.y + offsetY
+		local z = point.coords.z
+		local entity = CreateObject(model, x, y, z, false, true, true)
 		SetModelAsNoLongerNeeded(model)
 		PlaceObjectOnGroundProperly(entity)
 		FreezeEntityPosition(entity, true)
 		SetEntityCollision(entity, false, true)
-
-		point.entity = entity
+		point.entities[slot] = entity
+		if pcore2Available then
+			local id = exports.pcore2:AddLocalEntityInteraction({
+				entity = entity,
+				distance = 2.0,
+				interactDst = 1.5,
+				ignoreLos = true,
+				options = {
+					{
+						label = locale('open_drop') or 'Ouvrir',
+						icon = 'fas fa-box-open',
+						action = function()
+							client.openInventory('drop', point.invId)
+						end
+					}
+				}
+			})
+			if id then point.interactionIds[slot] = id end
+		end
 	end
 end
 
 local function onExitDrop(point)
-	local entity = point.entity
-
-	if entity then
-		Utils.DeleteEntity(entity)
-		point.entity = nil
+	if not point.entities then return end
+	local pcore2Available = GetResourceState('pcore2') == 'started'
+	for slot, entity in pairs(point.entities) do
+		if pcore2Available and point.interactionIds and point.interactionIds[slot] then
+			exports.pcore2:RemoveLocalEntityInteraction(entity, point.interactionIds[slot])
+		end
+		if DoesEntityExist(entity) then Utils.DeleteEntity(entity) end
 	end
+	point.entities = nil
+	point.interactionIds = nil
 end
 
 local function createDrop(dropId, data)
 	local point = lib.points.new({
 		coords = data.coords,
-		distance = 16,
+		distance = 30,
 		invId = dropId,
 		instance = data.instance,
-		model = data.model
+		model = data.model,
+		items = data.items
 	})
-
-	if point.model or client.dropprops then
-		point.distance = 30
-		point.onEnter = onEnterDrop
-		point.onExit = onExitDrop
-	else
-		point.nearby = nearbyDrop
-	end
-
+	point.onEnter = onEnterDrop
+	point.onExit = onExitDrop
 	client.drops[dropId] = point
 end
 
@@ -1116,9 +1141,21 @@ RegisterNetEvent('ox_inventory:removeDrop', function(dropId)
 
 		if point then
 			client.drops[dropId] = nil
+			onExitDrop(point)
 			point:remove()
+		end
+	end
+end)
 
-			if point.entity then Utils.DeleteEntity(point.entity) end
+RegisterNetEvent('ox_inventory:updateDrop', function(dropId, data)
+	if client.drops then
+		local point = client.drops[dropId]
+		if point then
+			point.items = data.items
+			point.coords = data.coords
+			point.instance = data.instance
+			onExitDrop(point)
+			onEnterDrop(point)
 		end
 	end
 end)
@@ -1143,18 +1180,13 @@ local function setStateBagHandler(stateId)
 		currentInstance = value
 
 		if client.drops then
-			-- Iterate over known drops and remove any points in a different instance (ignoring no instance)
 			for dropId, point in pairs(client.drops) do
 				if point.instance then
 					if point.instance ~= value then
-						if point.entity then
-							Utils.DeleteEntity(point.entity)
-							point.entity = nil
-						end
-
+						onExitDrop(point)
 						point:remove()
 					else
-						-- Recreate the drop using data from the old point
+						onExitDrop(point)
 						createDrop(dropId, point)
 					end
 				end
@@ -2022,7 +2054,8 @@ RegisterNUICallback('swapItems', function(data, cb)
 				end
 			end
 		else
-			data.coords = coords
+			local forward = GetEntityForwardVector(playerPed)
+			data.coords = coords + (forward * 1.0)
 		end
     end
 
@@ -2057,6 +2090,345 @@ RegisterNUICallback('swapItems', function(data, cb)
 		end
 	end
 end)
+
+local ballWeaponHash = `WEAPON_BALL`
+local ballProjectileModelHash = joaat("w_am_baseball")
+local throwAnimDict = 'melee@thrown@streamed_core_fps'
+local throwAnimName = 'plyr_takedown_front'
+local pickupAnimDict = 'pickup_object'
+local pickupAnimName = 'pickup_low'
+
+local function hideBallEntity(entity, disableCollision)
+	if not entity or entity == 0 or not DoesEntityExist(entity) then return end
+	SetEntityAlpha(entity, 0)
+	SetEntityVisible(entity, false, false)
+	SetEntityVisible(entity, false, true)
+	if disableCollision ~= false then
+		SetEntityCollision(entity, false, false)
+	end
+end
+
+local function hideBallProjectiles()
+	local pool = GetGamePool('CObject')
+	for i = 1, #pool do
+		local obj = pool[i]
+		if obj and DoesEntityExist(obj) and GetEntityModel(obj) == ballProjectileModelHash then
+			hideBallEntity(obj, false)
+		end
+	end
+end
+
+local ballProjectileHideDurationMs = 15000
+
+RegisterNetEvent('ox_inventory:hideBallProjectilesForDuration', function()
+	CreateThread(function()
+		local endTime = GetGameTimer() + ballProjectileHideDurationMs
+		while GetGameTimer() < endTime do
+			hideBallProjectiles()
+			Wait(0)
+		end
+	end)
+end)
+
+local function playThrowAnimation(ped)
+	if not ped or ped == 0 or not DoesEntityExist(ped) then return end
+	lib.requestAnimDict(throwAnimDict)
+	if not HasAnimDictLoaded(throwAnimDict) then return end
+	TaskPlayAnim(ped, throwAnimDict, throwAnimName, 4.0, -4.0, 1500, 48, 0.0, false, false, false)
+	CreateThread(function()
+		Wait(1600)
+		if DoesEntityExist(ped) and IsEntityPlayingAnim(ped, throwAnimDict, throwAnimName, 3) then
+			ClearPedSecondaryTask(ped)
+		end
+		RemoveAnimDict(throwAnimDict)
+	end)
+end
+
+local function playPickupAnimation(ped)
+	if not ped or ped == 0 or not DoesEntityExist(ped) then return end
+	lib.requestAnimDict(pickupAnimDict)
+	if not HasAnimDictLoaded(pickupAnimDict) then return end
+	ClearPedSecondaryTask(ped)
+	TaskPlayAnim(ped, pickupAnimDict, pickupAnimName, 4.0, -4.0, 1400, 48, 0.0, false, false, false)
+	CreateThread(function()
+		Wait(1500)
+		if DoesEntityExist(ped) and IsEntityPlayingAnim(ped, pickupAnimDict, pickupAnimName, 3) then
+			ClearPedSecondaryTask(ped)
+		end
+		RemoveAnimDict(pickupAnimDict)
+	end)
+end
+
+local function getDirectionFromRotation(rotation)
+	local dm = (math.pi / 180)
+	return vector3(-math.sin(dm * rotation.z) * math.abs(math.cos(dm * rotation.x)), math.cos(dm * rotation.z) * math.abs(math.cos(dm * rotation.x)), math.sin(dm * rotation.x))
+end
+
+local function createInvisibleBall(coords)
+	if not HasWeaponAssetLoaded(ballWeaponHash) then
+		RequestWeaponAsset(ballWeaponHash, 31, 0)
+		while not HasWeaponAssetLoaded(ballWeaponHash) do Wait(0) end
+	end
+	local ball = CreateWeaponObject(ballWeaponHash, 1, coords.x, coords.y, coords.z, false, 0.0, 0.0)
+	if ball and ball ~= 0 and DoesEntityExist(ball) then
+		SetEntityAlpha(ball, 0)
+		SetEntityVisible(ball, false, false)
+		SetEntityVisible(ball, false, true)
+		hideBallEntity(ball, false)
+		SetEntityCollision(ball, true, true)
+		FreezeEntityPosition(ball, false)
+	end
+	return ball
+end
+
+local function performThrowPhysicsBall(entity, power, ped)
+	FreezeEntityPosition(entity, false)
+	local rot = GetGameplayCamRot(2)
+	local dir = getDirectionFromRotation(rot)
+	local pedVelocity = vector3(0.0, 0.0, 0.0)
+	if ped and DoesEntityExist(ped) then
+		pedVelocity = GetEntityVelocity(ped)
+	end
+	SetEntityHeading(entity, rot.z + 90.0)
+	SetEntityVelocity(entity, dir.x * power + pedVelocity.x, dir.y * power + pedVelocity.y, dir.z * power + math.max(pedVelocity.z, 0.0))
+end
+
+local function performThrowPhysics(entity)
+	SetEntityCollision(entity, true, true)
+	SetEntityCompletelyDisableCollision(entity, false, false)
+	performThrowPhysicsBall(entity, 25.0, playerPed)
+end
+
+local function monitorThrownObject(ballEntity, itemEntity, itemPayload)
+	CreateThread(function()
+		if not ballEntity or ballEntity == 0 or not DoesEntityExist(ballEntity) or not itemEntity or not DoesEntityExist(itemEntity) then
+			if itemEntity and DoesEntityExist(itemEntity) then
+				SetEntityAsMissionEntity(itemEntity, true, true)
+				Utils.DeleteEntity(itemEntity)
+			end
+			return
+		end
+		local lastPosition = GetEntityCoords(ballEntity)
+		local startTime = GetGameTimer()
+		local endTime = startTime + 30000
+		local bounceCount = 0
+		local wasOnGround = false
+		while GetGameTimer() < endTime do
+			if not DoesEntityExist(ballEntity) or not DoesEntityExist(itemEntity) then break end
+			hideBallEntity(ballEntity, false)
+			hideBallProjectiles()
+			Wait(0)
+			local ballCoords = GetEntityCoords(ballEntity)
+			local ballHeading = GetEntityHeading(ballEntity)
+			SetEntityCoords(itemEntity, ballCoords.x, ballCoords.y, ballCoords.z, false, false, false, false)
+			SetEntityHeading(itemEntity, ballHeading)
+			local velocity = GetEntityVelocity(ballEntity)
+			local speed = #velocity
+			local currentCoords = GetEntityCoords(ballEntity)
+			local found, groundZ = GetGroundZFor_3dCoord(ballCoords.x, ballCoords.y, ballCoords.z + 0.5, false)
+			local isOnGround = false
+			if found then
+				local distance = math.abs(ballCoords.z - groundZ)
+				isOnGround = distance < 0.35
+			end
+			if isOnGround and not wasOnGround and speed > 0.5 then
+				bounceCount = bounceCount + 1
+				if bounceCount >= 1 then
+					SetEntityVelocity(ballEntity, velocity.x * 0.12, velocity.y * 0.12, 0.0)
+				end
+			end
+			if isOnGround and speed < 0.8 then
+				local finalCoords = GetEntityCoords(ballEntity)
+				local dropCoords = finalCoords
+				if playerPed and DoesEntityExist(playerPed) then
+					local pedCoords = GetEntityCoords(playerPed)
+					local pedDistance = #(pedCoords - finalCoords)
+					local dx = pedCoords.x - finalCoords.x
+					local dy = pedCoords.y - finalCoords.y
+					local horizontalDistance = math.sqrt(dx * dx + dy * dy)
+					if horizontalDistance <= 1.0 and pedDistance <= 1.5 then
+						playPickupAnimation(playerPed)
+						local offsetCoords = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 0.25, -0.45)
+						local groundFound, gz = GetGroundZFor_3dCoord(offsetCoords.x, offsetCoords.y, offsetCoords.z + 1.0, false)
+						if groundFound then
+							dropCoords = vector3(offsetCoords.x, offsetCoords.y, gz)
+						else
+							dropCoords = offsetCoords
+						end
+					end
+				end
+				TriggerServerEvent('ox_inventory:throwLanded', itemPayload, dropCoords)
+				break
+			end
+			wasOnGround = isOnGround
+			lastPosition = currentCoords
+		end
+		if ballEntity and ballEntity ~= 0 and DoesEntityExist(ballEntity) then
+			SetEntityAsMissionEntity(ballEntity, true, true)
+			Utils.DeleteEntity(ballEntity)
+		end
+		if itemEntity and DoesEntityExist(itemEntity) then
+			SetEntityAsMissionEntity(itemEntity, true, true)
+			Utils.DeleteEntity(itemEntity)
+		end
+	end)
+end
+
+RegisterNUICallback('throwItem', function(data, cb)
+	local function doThrow()
+		if not data or not data.fromSlot or not data.count or invBusy or usingItem then return false end
+		local success, model = lib.callback.await('ox_inventory:prepareThrow', false, { fromSlot = data.fromSlot, count = data.count })
+		if not success then return false end
+		if currentWeapon then currentWeapon = Weapon.Disarm(currentWeapon, true) end
+		local itemProp
+		local spawnCoords = GetEntityCoords(playerPed) + GetEntityForwardVector(playerPed)
+		local modelHash = type(model) == 'string' and joaat(model) or model
+		if not modelHash or not IsModelValid(modelHash) then modelHash = client.dropmodel end
+		lib.requestModel(modelHash)
+		itemProp = CreateObject(modelHash, spawnCoords.x, spawnCoords.y, spawnCoords.z + 7.0, true, false, false)
+		if not NetworkGetEntityIsNetworked(itemProp) then
+			NetworkRegisterEntityAsNetworked(itemProp)
+		end
+		SetEntityAsMissionEntity(itemProp, true, true)
+		SetEntityCollision(itemProp, false, false)
+		SetEntityCompletelyDisableCollision(itemProp, true, true)
+		SetEntityVisible(itemProp, true, false)
+		SetEntityAlpha(itemProp, 255)
+		AttachEntityToEntity(itemProp, playerPed, GetPedBoneIndex(playerPed, 0xDEAD), 0.1, -0.045, -0.025, -67.5, 32.5, -12.0, true, true, false, true, 1, true)
+		SetModelAsNoLongerNeeded(modelHash)
+		client.closeInventory()
+		CreateThread(function()
+			Wait(150)
+			SetNuiFocus(false, false)
+			SetNuiFocusKeepInput(false)
+			TriggerServerEvent('ox_inventory:ballThrowStarted')
+			GiveWeaponToPed(playerPed, ballWeaponHash, 1, false, true)
+			SetCurrentPedWeapon(playerPed, ballWeaponHash, true)
+			local threw = false
+			while true do
+				Wait(0)
+				hideBallProjectiles()
+				local _, wh = GetCurrentPedWeapon(playerPed, true)
+				if wh ~= ballWeaponHash then
+					GiveWeaponToPed(playerPed, ballWeaponHash, 1, false, true)
+					SetCurrentPedWeapon(playerPed, ballWeaponHash, true)
+				end
+				local weaponObj = GetCurrentPedWeaponEntityIndex(playerPed)
+				if weaponObj and weaponObj ~= 0 then
+					hideBallEntity(weaponObj, true)
+				end
+				if IsDisabledControlJustReleased(0, 194) then break end
+				if IsControlJustReleased(0, 24) then
+					playThrowAnimation(playerPed)
+					Wait(400)
+					if not itemProp or not DoesEntityExist(itemProp) then break end
+					DetachEntity(itemProp, true, true)
+					Wait(0)
+					SetEntityCollision(itemProp, false, false)
+					FreezeEntityPosition(itemProp, false)
+					SetEntityVisible(itemProp, true, false)
+					local pedCoords = GetEntityCoords(playerPed)
+					local pedVelocity = GetEntityVelocity(playerPed)
+					local pedSpeed = #(pedVelocity)
+					local forwardOffset = 0.5 + math.min(pedSpeed * 0.05, 0.6)
+					local heightOffset = 1.0 + math.min(pedSpeed * 0.02, 0.3)
+					local forwardCoords = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, forwardOffset, heightOffset)
+					local ballEntity = createInvisibleBall(forwardCoords)
+					if not ballEntity or ballEntity == 0 or not DoesEntityExist(ballEntity) then
+						if itemProp and DoesEntityExist(itemProp) then
+							SetEntityAsMissionEntity(itemProp, true, true)
+							Utils.DeleteEntity(itemProp)
+						end
+						break
+					end
+					SetEntityCoords(ballEntity, forwardCoords.x, forwardCoords.y, forwardCoords.z, false, false, false, false)
+					SetEntityVelocity(ballEntity, 0.0, 0.0, 0.0)
+					local throwPower = 18.0 + math.min(pedSpeed * 3.5, 7.0)
+					performThrowPhysicsBall(ballEntity, throwPower, playerPed)
+					hideBallEntity(ballEntity, false)
+					Wait(0)
+					hideBallEntity(ballEntity, false)
+					local ballCoords = GetEntityCoords(ballEntity)
+					local ballVelocity = GetEntityVelocity(ballEntity)
+					SetEntityCoords(itemProp, ballCoords.x, ballCoords.y, ballCoords.z, false, false, false, false)
+					SetEntityVelocity(itemProp, ballVelocity.x, ballVelocity.y, ballVelocity.z)
+					local removed, itemPayload = lib.callback.await('ox_inventory:throwItem', false, { fromSlot = data.fromSlot, count = data.count })
+					RemoveWeaponFromPed(playerPed, ballWeaponHash)
+					if removed and itemPayload then
+						monitorThrownObject(ballEntity, itemProp, itemPayload)
+					else
+						if itemProp and DoesEntityExist(itemProp) then
+							SetEntityAsMissionEntity(itemProp, true, true)
+							Utils.DeleteEntity(itemProp)
+						end
+						if ballEntity and DoesEntityExist(ballEntity) then
+							SetEntityAsMissionEntity(ballEntity, true, true)
+							Utils.DeleteEntity(ballEntity)
+						end
+					end
+					threw = true
+					break
+				end
+			end
+			SetCurrentPedWeapon(playerPed, `WEAPON_UNARMED`, true)
+			RemoveAllPedWeapons(playerPed, true)
+			if not threw and itemProp and DoesEntityExist(itemProp) then
+				SetEntityAsMissionEntity(itemProp, true, true)
+				Utils.DeleteEntity(itemProp)
+			end
+		end)
+		return true
+	end
+	local ok, result = pcall(doThrow)
+	cb(ok and result or false)
+end)
+
+local throwingWeapon = false
+
+local function throwCurrentWeapon()
+	if throwingWeapon or not currentWeapon or invBusy or cache.vehicle then return end
+	local ped = playerPed
+	local weaponName = currentWeapon.name
+	local weaponHash = currentWeapon.hash
+	throwingWeapon = true
+	CreateThread(function()
+		RequestAnimDict('melee@thrown@streamed_core')
+		local t = GetGameTimer()
+		while not HasAnimDictLoaded('melee@thrown@streamed_core') and (GetGameTimer() - t) < 2000 do
+			Wait(0)
+		end
+		if HasAnimDictLoaded('melee@thrown@streamed_core') then
+			TaskPlayAnim(ped, 'melee@thrown@streamed_core', 'plyr_takedown_front', -8.0, 8.0, -1, 49)
+			Wait(600)
+			ClearPedTasks(ped)
+		end
+	end)
+	Wait(550)
+	local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, 0.0, 1.0)
+	local prop = GetWeaponObjectFromPed(ped, true)
+	if not prop or not DoesEntityExist(prop) then
+		throwingWeapon = false
+		return
+	end
+	local model = GetEntityModel(prop)
+	RemoveWeaponFromPed(ped, weaponHash)
+	SetCurrentPedWeapon(ped, `WEAPON_UNARMED`, true)
+	DeleteEntity(prop)
+	prop = CreateObject(model, coords.x, coords.y, coords.z, true, false, true)
+	SetEntityCoords(prop, coords.x, coords.y, coords.z)
+	SetEntityHeading(prop, GetEntityHeading(ped) + 90.0)
+	performThrowPhysics(prop)
+	currentWeapon = nil
+	TriggerEvent('ox_inventory:currentWeapon')
+	TriggerServerEvent('ox_inventory:throwWeapon', { weapon = weaponName, net_id = ObjToNet(prop) })
+	throwingWeapon = false
+end
+
+RegisterCommand('ox_inventory:throwWeapon', function()
+	throwCurrentWeapon()
+end, false)
+
+RegisterKeyMapping('ox_inventory:throwWeapon', 'Throw weapon', 'keyboard', client.throwkey or 'e')
 
 RegisterNUICallback('buyItem', function(data, cb)
 	---@type boolean, false | { [1]: number, [2]: SlotWithItem, [3]: SlotWithItem | false, [4]: number}, NotifyProps
