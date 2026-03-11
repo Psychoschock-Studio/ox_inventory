@@ -118,6 +118,95 @@ exports('RegisterShop', function(shopType, shopDetails)
 	registerShopType(shopType, shopDetails)
 end)
 
+local function getShopDisplayName(shop)
+	if type(shop) == 'table' then
+		return shop.name or shop.label
+	end
+	return nil
+end
+
+exports('GetShopsList', function()
+	local list = {}
+	for shopType, shop in pairs(Shops) do
+		if type(shopType) == 'string' and type(shop) == 'table' and not tonumber(shopType) then
+			local name = getShopDisplayName(shop) or shopType
+			list[#list + 1] = { id = shopType, name = name }
+		end
+	end
+	return list
+end)
+
+local function getItemsForShop(shopType)
+	local shop = Shops[shopType]
+	if not shop then return nil end
+	local itemsSource = shop.items
+	if not itemsSource and shop.inventory then
+		local firstId = next(shop.locations or shop[locations] or {})
+		if firstId then
+			local created = createShop(shopType, firstId)
+			if created then itemsSource = created.items end
+		end
+		if not itemsSource then
+			itemsSource = {}
+			for i, raw in ipairs(shop.inventory) do
+				local Item = Items(raw.name)
+				if Item then
+					itemsSource[i] = { name = Item.name, slot = i, price = raw.price or 0, count = raw.count, currency = raw.currency }
+				end
+			end
+		end
+	end
+	return itemsSource
+end
+
+exports('GetShopInventory', function(shopType)
+	local itemsSource = getItemsForShop(shopType)
+	if not itemsSource then return nil end
+	local out = {}
+	for i = 1, #itemsSource do
+		local slot = itemsSource[i]
+		if slot and slot.name then
+			local Item = Items(slot.name)
+			local label = Item and Item.label or slot.name
+			out[#out + 1] = {
+				slot = slot.slot or i,
+				name = slot.name,
+				label = label,
+				price = slot.price or 0,
+				count = slot.count,
+				currency = slot.currency,
+			}
+		end
+	end
+	return out
+end)
+
+exports('UpdateShopItem', function(shopType, slotIndex, payload)
+	local shop = Shops[shopType]
+	if not shop or not payload then return false end
+	if shop.items then
+		local slot = shop.items[slotIndex]
+		if slot then
+			if payload.price ~= nil then slot.price = tonumber(payload.price) or 0 end
+			if payload.count ~= nil then slot.count = math.max(0, math.floor(tonumber(payload.count) or 0)) end
+			return true
+		end
+	end
+	if shop.inventory and shop.inventory[slotIndex] then
+		local raw = shop.inventory[slotIndex]
+		if payload.price ~= nil then raw.price = tonumber(payload.price) or 0 end
+		if payload.count ~= nil then raw.count = math.max(0, math.floor(tonumber(payload.count) or 0)) end
+		for id, instance in pairs(shop) do
+			if type(id) == 'number' and instance.items and instance.items[slotIndex] then
+				if payload.price ~= nil then instance.items[slotIndex].price = raw.price end
+				if payload.count ~= nil then instance.items[slotIndex].count = raw.count end
+			end
+		end
+		return true
+	end
+	return false
+end)
+
 lib.callback.register('ox_inventory:openShop', function(source, data)
 	local playerInv, shop = Inventory(source)
 
@@ -289,6 +378,8 @@ lib.callback.register('ox_inventory:buyItem', function(source, data)
 						lib.logger(playerInv.owner, 'buyItem', ('"%s" %s'):format(playerInv.label, message:lower()), ('shop:%s'):format(shop.label))
 					end
 				end
+
+				TriggerEvent('ox_inventory:shopPurchase', source, shopType, shopId and tostring(shopId) or shopType, shop.label or shopType, fromData.name, count, price, currency)
 
 				return true, {data.toSlot, playerInv.items[data.toSlot], shop.items[data.fromSlot].count and shop.items[data.fromSlot], playerInv.weight}, { type = 'success', description = message }
 			end
