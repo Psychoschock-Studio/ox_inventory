@@ -248,6 +248,16 @@ return {
 		}
 	},
 
+	['handcuff_key'] = {
+		label = 'Clé de menottes universelle',
+		weight = 50,
+		stack = true,
+		consume = 0,
+		client = {
+			export = 'pcore2.useHandcuffKey'
+		}
+	},
+
 	['spike_strip'] = {
 		label = 'Hérisson',
 		weight = 5000,
@@ -275,6 +285,36 @@ return {
 		consume = 0,
 		client = {
 			export = 'pcore2.usePoliceBarrier'
+		}
+	},
+
+	['pol_barrier_stop'] = {
+		label = 'Panneau Stop',
+		weight = 1500,
+		stack = true,
+		consume = 0,
+		client = {
+			export = 'pcore2.usePolBarrierStop'
+		}
+	},
+
+	['pol_barrier_slow'] = {
+		label = 'Panneau Ralentir',
+		weight = 1500,
+		stack = true,
+		consume = 0,
+		client = {
+			export = 'pcore2.usePolBarrierSlow'
+		}
+	},
+
+	['pol_spikes'] = {
+		label = 'Herse de police',
+		weight = 5000,
+		stack = true,
+		consume = 0,
+		client = {
+			export = 'pcore2.usePolSpikes'
 		}
 	},
 
