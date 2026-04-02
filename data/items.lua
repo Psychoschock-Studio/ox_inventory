@@ -57,6 +57,8 @@ return {
 	['bandage'] = {
 		label = 'Bandage',
 		weight = 115,
+		consume = 1,
+		server = { export = 'pcore2.HealthUseItem' },
 		client = {
 			anim = { dict = 'missheistdockssetup1clipboard@idle_a', clip = 'idle_a', flag = 49 },
 			prop = { model = `prop_rolled_sock_02`, pos = vec3(-0.14, -0.14, -0.08), rot = vec3(-50.0, -50.0, 0.0) },
@@ -527,5 +529,78 @@ return {
 		client = {
 			export = 'pcore2.equipOutfit'
 		}
+	},
+
+	['mechanic_engine_kit'] = {
+		label = 'Kit Réparation Moteur',
+		weight = 3000,
+		stack = false,
+		client = {
+			export = 'pcore2.useMechanicItem',
+		},
+	},
+	['mechanic_body_kit'] = {
+		label = 'Kit Réparation Carrosserie',
+		weight = 4000,
+		stack = false,
+		client = {
+			export = 'pcore2.useMechanicItem',
+		},
+	},
+	['mechanic_tire_kit'] = {
+		label = 'Kit Réparation Pneus',
+		weight = 2000,
+		stack = false,
+		client = {
+			export = 'pcore2.useMechanicItem',
+		},
+	},
+	['mechanic_brake_kit'] = {
+		label = 'Kit Réparation Freins',
+		weight = 2500,
+		stack = false,
+		client = {
+			export = 'pcore2.useMechanicItem',
+		},
+	},
+	['mechanic_suspension_kit'] = {
+		label = 'Kit Réparation Suspension',
+		weight = 3500,
+		stack = false,
+		client = {
+			export = 'pcore2.useMechanicItem',
+		},
+	},
+	['mechanic_electronics_kit'] = {
+		label = 'Kit Réparation Électronique',
+		weight = 1500,
+		stack = false,
+		client = {
+			export = 'pcore2.useMechanicItem',
+		},
+	},
+	['mechanic_advanced_kit'] = {
+		label = 'Kit Réparation Avancé',
+		weight = 8000,
+		stack = false,
+		client = {
+			export = 'pcore2.useMechanicItem',
+		},
+	},
+	['mechanic_diagnostic_tool'] = {
+		label = 'Tablette de Diagnostic',
+		weight = 800,
+		stack = false,
+		client = {
+			export = 'pcore2.useMechanicItem',
+		},
+	},
+	['mechanic_cleaning_kit'] = {
+		label = 'Kit de Nettoyage Véhicule',
+		weight = 1500,
+		stack = false,
+		client = {
+			export = 'pcore2.useMechanicItem',
+		},
 	},
 }
